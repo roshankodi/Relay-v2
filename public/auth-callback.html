@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signing you in — Relay</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="shell-card">
+    <main class="container" style="display:grid; place-items:center; min-height:280px; text-align:center;">
+      <div>
+        <div class="spinner" style="margin:0 auto 16px;"></div>
+        <p class="text-muted" id="status">Finishing sign-in…</p>
+      </div>
+    </main>
+  </div>
+  <script type="module">
+    import { api } from '/js/shared.js';
+
+    // Supabase's OAuth redirect hands the session back in the URL
+    // fragment (#access_token=...) — never sent to any server, only
+    // readable here in the browser. We post it once to our own endpoint,
+    // which verifies it and sets httpOnly cookies, then discard it.
+    const params = new URLSearchParams(location.hash.slice(1));
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+    const expires_in = Number(params.get('expires_in')) || undefined;
+    const oauthError = params.get('error_description') || new URLSearchParams(location.search).get('error_description');
+
+    history.replaceState(null, '', location.pathname); // scrub tokens from the visible URL
+
+    async function run() {
+      if (oauthError) {
+        document.getElementById('status').textContent = oauthError;
+        return;
+      }
+      if (!access_token || !refresh_token) {
+        document.getElementById('status').textContent = 'Sign-in did not complete. Return to the login page and try again.';
+        return;
+      }
+      try {
+        await api('/api/auth/oauth-session', { method: 'POST', body: { access_token, refresh_token, expires_in } });
+        window.location.href = '/app';
+      } catch (e) {
+        document.getElementById('status').textContent = e.message || 'Sign-in failed.';
+      }
+    }
+    run();
+  </script>
+</body>
+</html>

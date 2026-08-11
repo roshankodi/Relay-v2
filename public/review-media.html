@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Review — Relay</title>
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('theme');
+        var dark = saved ? saved === 'dark' : true;
+        if (dark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="shell-card shell-card-wide">
+    <div class="guest-banner" id="guest-banner" hidden>
+      <span>Reviewing as <strong id="guest-name-label"></strong></span>
+      <button class="btn btn-ghost" id="change-identity-btn" style="padding:4px 10px; font-size:12px;">Not you?</button>
+    </div>
+    <header class="topbar">
+      <span class="brand">Relay</span>
+      <button class="btn btn-ghost btn-icon" id="theme-btn" aria-label="Toggle theme"></button>
+    </header>
+
+    <main class="container">
+      <a href="#" id="back-link" class="text-muted" style="font-size:13px;">← Back to workspace</a>
+      <h1 id="media-name" style="font-size: 26px; font-weight: 800; margin: 10px 0 20px;">Loading…</h1>
+
+      <div class="grid review-layout">
+        <section class="card" style="overflow:hidden;" id="stage-card">
+          <div class="skeleton" style="aspect-ratio:16/9;"></div>
+        </section>
+
+        <aside style="display:flex; flex-direction:column; height:100%;">
+          <div class="card card-glass" style="border-radius:var(--radius-2xl); padding:20px; display:flex; flex-direction:column; max-height:calc(100vh - 180px); min-height:540px; height:100%; box-sizing:border-box;">
+            <!-- Header Bar -->
+            <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:14px; border-bottom:1px solid var(--glass-border); flex-shrink:0;">
+              <h2 style="font-size:13px; color:var(--color-text-secondary); font-weight:800; text-transform:uppercase; letter-spacing:0.04em; margin:0;">COMMENTS</h2>
+              <span class="text-muted" id="comment-count" style="font-size:12px; font-weight:600;"></span>
+            </div>
+
+            <!-- Scrollable Feed -->
+            <div class="comment-list" id="comments" style="flex:1; min-height:0; overflow-y:auto; padding:14px 4px 14px 0; display:flex; flex-direction:column; gap:12px;"></div>
+
+            <!-- Bottom Input Bar -->
+            <form id="comment-form" style="margin-top:auto; padding-top:14px; border-top:1px solid var(--glass-border); flex-shrink:0;">
+              <div style="display:flex; align-items:center; gap:8px; background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-pill); padding:6px 8px 6px 14px; box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+                <span class="anchor-badge" id="anchor-badge" style="flex-shrink:0;">0:00</span>
+                <input type="text" id="comment-body" placeholder="Leave your comment…" required maxlength="5000" style="flex:1; background:transparent; border:none; color:var(--color-text-primary); font-size:13px; outline:none; font-family:inherit; padding:8px 12px; margin-left:4px;" />
+                <button type="submit" class="btn btn-primary" style="width:34px; height:34px; border-radius:50%; padding:0; display:grid; place-items:center; flex-shrink:0; font-size:13px; box-shadow:0 2px 10px rgba(46,125,79,0.4);" title="Send comment">➤</button>
+              </div>
+            </form>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { api, toggleTheme, toast, getGuestIdentity, icon } from '/js/shared.js';
+    import { initReviewPage } from '/js/player.js';
+    import { ensureGuestIdentity, openGuestIdentityDialog } from '/js/guest-identity.js';
+
+    function paintThemeIcon() {
+      document.getElementById('theme-btn').innerHTML = icon(document.documentElement.classList.contains('dark') ? 'sun' : 'moon', { size: 16 });
+    }
+    paintThemeIcon();
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      toggleTheme();
+      paintThemeIcon();
+    });
+
+    function renderGuestBanner() {
+      const identity = getGuestIdentity();
+      const banner = document.getElementById('guest-banner');
+      if (identity) {
+        banner.hidden = false;
+        document.getElementById('guest-name-label').textContent = identity.name;
+      } else {
+        banner.hidden = true;
+      }
+    }
+    document.getElementById('change-identity-btn').addEventListener('click', () => openGuestIdentityDialog({ force: true }).then(renderGuestBanner));
+    renderGuestBanner();
+
+    const parts = location.pathname.split('/').filter(Boolean); // review, :token, media, :mediaId
+    const token = parts[1];
+    const mediaId = parts[3];
+    document.getElementById('back-link').href = `/review/${token}`;
+
+    function guestHeaders() {
+      const identity = getGuestIdentity();
+      return identity ? { 'x-relay-guest-token': identity.token } : {};
+    }
+
+    const page = initReviewPage({
+      stageCard: document.getElementById('stage-card'),
+      commentsEl: document.getElementById('comments'),
+      commentCountEl: document.getElementById('comment-count'),
+      composerForm: document.getElementById('comment-form'),
+      bodyInput: document.getElementById('comment-body'),
+      anchorBadge: document.getElementById('anchor-badge'),
+      rangeControls: {
+        wrap: document.getElementById('range-inputs'),
+        modeRow: document.getElementById('mode-row'),
+        startInput: document.getElementById('range-start'),
+        endInput: document.getElementById('range-end'),
+        clearBtn: document.getElementById('range-clear'),
+        pointBtn: document.getElementById('mode-point'),
+        rangeBtn: document.getElementById('mode-range'),
+      },
+      adapter: {
+        loadMedia: () => api(`/api/public/${token}/media/${mediaId}`, { headers: guestHeaders() }),
+        createComment: async payload => {
+          const identity = await ensureGuestIdentity();
+          if (!identity) throw new Error('Add your name and email to comment.');
+          renderGuestBanner();
+          return api(`/api/public/${token}/comments`, {
+            method: 'POST',
+            body: { ...payload, guestName: identity.name, guestEmail: identity.email, guestToken: identity.token },
+          });
+        },
+        editComment: (id, body) => api(`/api/public/${token}/comments/${id}`, { method: 'PATCH', body: { body }, headers: guestHeaders() }),
+        deleteComment: id => api(`/api/public/${token}/comments/${id}`, { method: 'DELETE', headers: guestHeaders() }),
+      },
+    });
+
+    page.start();
+  </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=0b03114c-cac8-48dd-9879-2111cd55959d"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

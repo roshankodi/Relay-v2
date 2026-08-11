@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relay — Drive media reviews</title>
+  <meta name="description" content="Review media in Google Drive" />
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('theme');
+        var dark = saved ? saved === 'dark' : true;
+        if (dark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar" style="position:sticky; top:16px; z-index:1000; max-width:1320px; margin:16px auto 0; padding: 14px 28px; border-radius: var(--radius-2xl); background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center; box-shadow:0 12px 40px rgba(0,0,0,0.18);">
+    <div style="display:flex; gap:40px; align-items:center;">
+      <a class="brand" href="/" style="font-size:22px; font-weight:900; letter-spacing:-0.5px; color:var(--color-text-primary); text-decoration:none; display:flex; align-items:center; gap:8px;">
+        <span style="width:10px; height:10px; border-radius:50%; background:var(--color-brand-accent); box-shadow:0 0 12px var(--color-brand-accent);"></span>
+        Relay
+      </a>
+      <nav style="display:flex; gap:28px; font-size:14px; font-weight:600;">
+        <a href="#features" class="nav-scroll-link" style="color:var(--color-text-secondary); text-decoration:none; transition:color 0.15s ease;">Features</a>
+        <a href="/app" style="color:var(--color-text-secondary); text-decoration:none; transition:color 0.15s ease;">Workspaces</a>
+      </nav>
+    </div>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <button class="btn btn-ghost btn-icon" id="theme-btn" aria-label="Toggle theme" style="width:38px; height:38px; border-radius:var(--radius-md); border:1px solid var(--glass-border); display:grid; place-items:center; cursor:pointer; background:var(--glass-bg); color:var(--color-text-primary);"></button>
+      <a class="btn btn-primary" href="/login" id="signin-btn" style="gap:6px; padding: 10px 24px; font-weight:700; border-radius:var(--radius-pill); box-shadow:0 4px 16px rgba(46,125,79,0.35);">Sign in</a>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1320px; padding: 72px 32px 32px; text-align: center; position:relative;">
+    <!-- Background Ambient Glow -->
+    <div style="position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:650px; height:450px; background:radial-gradient(circle, rgba(46,125,79,0.18) 0%, rgba(76,175,107,0.08) 45%, transparent 70%); pointer-events:none; z-index:-1; filter:blur(40px);"></div>
+
+    <span class="floating-bubble" style="top:40px; left:30px;" id="bubble-chat"></span>
+    <span class="floating-bubble" style="top:70px; right:50px;" id="bubble-link"></span>
+    <span class="floating-bubble" style="top:240px; left:80px;" id="bubble-target"></span>
+    <span class="floating-bubble" style="top:270px; right:100px;" id="bubble-folder"></span>
+
+    <div style="margin-bottom:20px; display:inline-block;">
+      <span class="anchor-badge" style="gap:10px; padding: 8px 22px; font-size: 13px; background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(16px); border-radius:var(--radius-pill); font-weight:700; color:var(--color-brand-accent); box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+        <span class="pulse-dot"></span> Next-Gen Frame-Accurate Feedback
+      </span>
+    </div>
+    
+    <h1 style="font-size: 62px; font-weight: 900; letter-spacing: -1.8px; max-width: 960px; margin: 12px auto 0; line-height: 1.1;">
+      Review media directly from your <span class="text-gradient-hero">Google Drive</span>
+    </h1>
+    <p class="text-muted" style="max-width: 640px; margin: 24px auto 44px; font-size: 18px; line-height: 1.6; font-weight: 400;">
+      Point Relay at any public Drive folder. Your creative team can drop timestamped comments,
+      range selections, and pin annotations instantly — zero downloads required.
+    </p>
+    <div style="display:flex; justify-content:center; gap:16px; margin: 24px auto 68px; align-items:center;">
+      <a class="btn btn-primary" href="/login" id="cta-btn" style="padding: 16px 38px; font-size: 16px; font-weight: 700; gap:10px; border-radius:var(--radius-pill); box-shadow: 0 8px 30px rgba(46,125,79,0.45); transition:transform 0.2s ease;">Get started for free</a>
+      <a class="btn btn-ghost" href="/app" style="padding: 16px 32px; font-size: 15px; font-weight: 700; border-radius:var(--radius-pill); border:1px solid var(--glass-border); background:var(--glass-bg); backdrop-filter:blur(12px);">Explore Workspaces →</a>
+    </div>
+
+    <!-- Product Preview Window Mockup -->
+    <div class="card card-glass" style="max-width: 1060px; margin: 0 auto 80px; padding: 0; text-align:left; border-radius: var(--radius-2xl); overflow:hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.12);">
+      <div style="padding: 14px 24px; background: rgba(0,0,0,0.15); border-bottom: 1px solid var(--glass-border); display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span style="width:11px; height:11px; border-radius:50%; background: #FF5F56; display:inline-block;"></span>
+          <span style="width:11px; height:11px; border-radius:50%; background: #FFBD2E; display:inline-block;"></span>
+          <span style="width:11px; height:11px; border-radius:50%; background: #27C93F; display:inline-block;"></span>
+        </div>
+        <div style="font-size:12px; font-weight:700; color:var(--color-text-secondary); letter-spacing:0.3px;">relay.app/review/deep-lab-workspace</div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <span style="font-size:11px; font-weight:800; color:var(--color-brand-accent); background:color-mix(in srgb, var(--color-brand-accent) 18%, transparent); padding:4px 12px; border-radius:var(--radius-pill); border:1px solid color-mix(in srgb, var(--color-brand-accent) 35%, transparent);">● Live Workspace</span>
+        </div>
+      </div>
+      <div style="padding: 32px; display:grid; grid-template-columns: 1.35fr 1fr; gap: 28px; align-items:stretch; background: var(--glass-bg);">
+        <div style="background: rgba(0,0,0,0.30); border:1px solid var(--glass-border); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: var(--radius-xl); padding: 24px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13px; font-weight:800; color:var(--color-text-primary);">commercial-cut-v3.mp4</span>
+            <span style="font-size:11px; font-weight:700; background:rgba(255,255,255,0.08); padding:3px 10px; border-radius:var(--radius-md); border:1px solid var(--glass-border); color:var(--color-text-secondary);">4K · 60fps</span>
+          </div>
+          <div style="text-align:center; padding: 48px 0; color: var(--color-brand-accent);">
+            <div style="width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg, #2E7D4F, #4CAF6B); color:#FFF; display:grid; place-items:center; margin:0 auto 14px; font-size:26px; font-weight:800; box-shadow:0 8px 28px rgba(76,175,107,0.5); cursor:pointer; transition:transform 0.2s ease;">▶</div>
+            <span style="font-size:12px; font-weight:700; color:var(--color-text-secondary);">Click marker to jump to exact timestamp</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:700; color:var(--color-text-secondary);">
+            <span>00:15 / 00:45</span>
+            <div style="flex:1; margin: 0 14px; height:6px; background:rgba(255,255,255,0.10); border-radius:3px; position:relative;">
+              <div style="width:38%; height:100%; background:linear-gradient(90deg, #2E7D4F, #4CAF6B); border-radius:3px;"></div>
+              <div style="position:absolute; left:38%; top:-4px; width:14px; height:14px; border-radius:50%; background:#FFFFFF; box-shadow:0 2px 8px rgba(0,0,0,0.40);"></div>
+            </div>
+            <span>HD</span>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-secondary);">Live Comments (2)</div>
+          <div class="comment-card" style="padding:16px 18px;">
+            <span class="comment-avatar" style="background:#C2410C;">SC</span>
+            <span class="comment-body-col" style="flex:1;">
+              <div style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:4px;">
+                <span style="font-weight:800; font-size:14px; color:var(--color-text-primary);">Sarah Chen</span>
+                <span class="comment-time-badge" style="font-size:11px; font-weight:800; padding:2px 8px;">0:15–0:20</span>
+              </div>
+              <p style="font-size:13px; margin:0; color:var(--color-text-secondary); line-height:1.45;">"Love the lighting transition here! Could we make the logo overlay 15% larger?"</p>
+            </span>
+          </div>
+          <div class="comment-card" style="padding:16px 18px;">
+            <span class="comment-avatar" style="background:linear-gradient(135deg, #E8A33D, #B8731D);">AR</span>
+            <span class="comment-body-col" style="flex:1;">
+              <div style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:4px;">
+                <span style="font-weight:800; font-size:14px; color:var(--color-text-primary);">Alex Rivera</span>
+                <span class="comment-time-badge" style="font-size:11px; font-weight:800; padding:2px 8px;">0:32</span>
+              </div>
+              <p style="font-size:13px; margin:0; color:var(--color-text-secondary); line-height:1.45;">"Approved for final export. Sending Drive public link to client."</p>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Grid Section -->
+    <div id="features" style="padding-top:40px; margin-bottom:96px;">
+      <div style="margin-bottom:48px; text-align:center;">
+        <span style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1.4px; color:var(--color-brand-accent);">Built for Creative Teams</span>
+        <h2 style="font-size: 38px; font-weight: 900; margin: 10px 0 0; letter-spacing:-0.8px;">Everything you need for seamless reviews</h2>
+      </div>
+      <div class="grid grid-3" style="gap: 32px; text-align:left;">
+        <div class="card card-glass" style="padding:36px; position:relative; border-radius:var(--radius-2xl);">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 18px;">
+            <span class="stat-icon" id="feature-icon-1" style="width: 48px; height: 48px; background:color-mix(in srgb, var(--color-brand-accent) 20%, transparent); border-radius:var(--radius-lg); display:grid; place-items:center; color:var(--color-brand-accent);"></span>
+            <span class="text-muted" style="letter-spacing:2px; font-size:11px;">⋮⋮⋮</span>
+          </div>
+          <h3 style="font-size:20px; font-weight: 800; margin:14px 0 10px;">Frame-accurate feedback</h3>
+          <p class="text-muted" style="font-size:14px; line-height: 1.6;">Comment at an exact timestamp or drag to select a range — feedback lands exactly where it belongs.</p>
+          <ul class="feature-checklist" id="checklist-1" style="margin-top:16px;"></ul>
+        </div>
+        <div class="card card-glass" style="padding:36px; position:relative; border-radius:var(--radius-2xl);">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 18px;">
+            <span class="stat-icon" id="feature-icon-2" style="width: 48px; height: 48px; background:color-mix(in srgb, var(--color-brand-accent) 20%, transparent); border-radius:var(--radius-lg); display:grid; place-items:center; color:var(--color-brand-accent);"></span>
+            <span class="text-muted" style="letter-spacing:2px; font-size:11px;">⋮⋮⋮</span>
+          </div>
+          <h3 style="font-size:20px; font-weight: 800; margin:14px 0 10px;">Share without friction</h3>
+          <p class="text-muted" style="font-size:14px; line-height: 1.6;">Send a link. Reviewers add their name once and start commenting — no account, no signup needed.</p>
+          <ul class="feature-checklist" id="checklist-2" style="margin-top:16px;"></ul>
+        </div>
+        <div class="card card-glass" style="padding:36px; position:relative; border-radius:var(--radius-2xl);">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 18px;">
+            <span class="stat-icon" id="feature-icon-3" style="width: 48px; height: 48px; background:color-mix(in srgb, var(--color-brand-accent) 20%, transparent); border-radius:var(--radius-lg); display:grid; place-items:center; color:var(--color-brand-accent);"></span>
+            <span class="text-muted" style="letter-spacing:2px; font-size:11px;">⋮⋮⋮</span>
+          </div>
+          <h3 style="font-size:20px; font-weight: 800; margin:14px 0 10px;">Stays in Drive</h3>
+          <p class="text-muted" style="font-size:14px; line-height: 1.6;">Nothing gets uploaded or duplicated. Relay reads directly from a Google Drive folder you already own.</p>
+          <ul class="feature-checklist" id="checklist-3" style="margin-top:16px;"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works Workflow Pipeline -->
+    <div id="workflow" style="padding-top:40px; margin-bottom:96px; text-align:center;">
+      <div style="margin-bottom:52px;">
+        <span style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1.4px; color:var(--color-brand-accent);">Effortless 3-Step Workflow</span>
+        <h2 style="font-size: 38px; font-weight: 900; margin: 10px 0 0; letter-spacing:-0.8px;">How Relay simplifies your reviews</h2>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; text-align:left;">
+        <div class="card card-glass" style="padding: 36px; border-radius:var(--radius-2xl); position:relative;">
+          <div style="font-size: 38px; font-weight: 900; color: var(--color-brand-accent); opacity: 0.9; margin-bottom: 16px;">01</div>
+          <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 10px;">Connect Drive Folder</h3>
+          <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin:0;">Paste any public Google Drive folder URL. Relay automatically indexes video, audio, and images instantly.</p>
+        </div>
+        <div class="card card-glass" style="padding: 36px; border-radius:var(--radius-2xl); position:relative;">
+          <div style="font-size: 38px; font-weight: 900; color: var(--color-brand-accent); opacity: 0.9; margin-bottom: 16px;">02</div>
+          <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 10px;">Share Review Link</h3>
+          <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin:0;">Send your workspace link to clients or teammates. Reviewers enter their name and start leaving feedback with zero login.</p>
+        </div>
+        <div class="card card-glass" style="padding: 36px; border-radius:var(--radius-2xl); position:relative;">
+          <div style="font-size: 38px; font-weight: 900; color: #E8A33D; opacity: 0.95; margin-bottom: 16px;">03</div>
+          <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 10px;">Annotate & Export</h3>
+          <p class="text-muted" style="font-size: 14px; line-height: 1.6; margin:0;">Leave frame-accurate timestamp markers, range selections, and image notes that sync directly in real time.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Complete Multi-Column Glass Footer -->
+  <footer style="margin-top:80px; background: var(--glass-bg); border-top: 1px solid var(--glass-border); backdrop-filter: blur(20px); padding: 56px 40px 36px;">
+    <div style="max-width:1320px; margin:0 auto; display:grid; grid-template-columns: 2fr 1fr 1.2fr 1fr; gap: 48px; margin-bottom: 48px;">
+      <div>
+        <div class="brand" style="font-size:22px; font-weight:900; letter-spacing:-0.5px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+          <span style="width:10px; height:10px; border-radius:50%; background:var(--color-brand-accent); box-shadow:0 0 12px var(--color-brand-accent);"></span>
+          Relay
+        </div>
+        <p class="text-muted" style="font-size:14px; max-width: 320px; line-height:1.65; margin:0;">
+          Direct media reviews and timestamped collaborative feedback by Deep Sauce Labs.
+        </p>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:18px; color:var(--color-text-primary);">Product</div>
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
+          <a href="#features" class="nav-scroll-link" style="color:var(--color-text-secondary); text-decoration:none;">Features</a>
+          <a href="#workflow" class="nav-scroll-link" style="color:var(--color-text-secondary); text-decoration:none;">How it works</a>
+          <a href="/app" style="color:var(--color-text-secondary); text-decoration:none;">Workspaces</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:18px; color:var(--color-text-primary);">Studio & Apps</div>
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
+          <a href="https://deepsaucelabs.com/" target="_blank" rel="noopener noreferrer" style="color:var(--color-text-secondary); text-decoration:none; transition:color 0.15s ease;">Deep Sauce Labs</a>
+          <a href="https://badaboom.app/" target="_blank" rel="noopener noreferrer" style="color:var(--color-brand-accent); font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px;">Badaboom <span style="font-size:10px; background:color-mix(in srgb, var(--color-brand-accent) 20%, transparent); padding:2px 6px; border-radius:var(--radius-pill); border:1px solid color-mix(in srgb, var(--color-brand-accent) 35%, transparent);">Featured</span></a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:18px; color:var(--color-text-primary);">Legal</div>
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
+          <a href="https://deepsaucelabs.com/privacy" target="_blank" rel="noopener noreferrer" style="color:var(--color-text-secondary); text-decoration:none; transition:color 0.15s ease;">Privacy Policy</a>
+          <a href="#" style="color:var(--color-text-secondary); text-decoration:none;">Terms of Service</a>
+          <a href="#" style="color:var(--color-text-secondary); text-decoration:none;">Security</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1320px; margin:0 auto; padding-top: 28px; border-top: 1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--color-text-secondary);">
+      <div>© 2026 Deep Sauce Labs. All rights reserved.</div>
+      <div style="display:flex; gap:20px; font-weight:600;">
+        <span>Built for video, audio & design workflows</span>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { icon, toggleTheme } from '/js/shared.js';
+
+    function updateThemeIcon() {
+      document.getElementById('theme-btn').innerHTML = icon(document.documentElement.classList.contains('dark') ? 'sun' : 'moon', { size: 16 });
+    }
+    updateThemeIcon();
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      toggleTheme();
+      updateThemeIcon();
+    });
+
+    document.getElementById('bubble-chat').innerHTML = icon('chat', { size: 18 });
+    document.getElementById('bubble-link').innerHTML = icon('link', { size: 18 });
+    document.getElementById('bubble-target').innerHTML = icon('sync', { size: 18 });
+    document.getElementById('bubble-folder').innerHTML = icon('folder', { size: 18 });
+    document.getElementById('cta-btn').innerHTML = icon('sync', { size: 15 }) + 'Get started';
+    document.getElementById('feature-icon-1').innerHTML = icon('video', { size: 17 });
+    document.getElementById('feature-icon-2').innerHTML = icon('link', { size: 17 });
+    document.getElementById('feature-icon-3').innerHTML = icon('folder', { size: 17 });
+    document.getElementById('card-sparkle').innerHTML = icon('sparkle', { size: 16 });
+
+    const check = t => `<li>${icon('check', { size: 14 })} ${t}</li>`;
+    document.getElementById('checklist-1').innerHTML = [check('Timestamped comments'), check('Range markers'), check('Pixel-perfect context')].join('');
+    document.getElementById('checklist-2').innerHTML = [check('Public link access'), check('Name + email only'), check('Instant commenting')].join('');
+    document.getElementById('checklist-3').innerHTML = [check('No file uploads'), check('Always up to date'), check('Secure & private')].join('');
+
+    document.querySelectorAll('.nav-scroll-link').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href.startsWith('#')) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    });
+  </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=0b03114c-cac8-48dd-9879-2111cd55959d"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

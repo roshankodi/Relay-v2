@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your workspaces — Relay</title>
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('theme');
+        var dark = saved ? saved === 'dark' : true;
+        if (dark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div class="shell-content">
+      <header class="topbar" style="padding: 18px 36px;">
+        <a class="brand" href="/app" style="font-size:22px; font-weight:900; letter-spacing:-0.5px; color:var(--color-text-primary); text-decoration:none;">Relay</a>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <button class="btn btn-ghost btn-icon" id="theme-btn" aria-label="Toggle theme" style="width:36px; height:36px; border-radius:var(--radius-md); border:1px solid var(--glass-border); display:grid; place-items:center; cursor:pointer; background:var(--glass-bg); color:var(--color-text-primary);"></button>
+          <div class="sidebar-account" id="sidebar-account" title="Account" style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, var(--color-brand-accent), #1B5E3A); color:#FFF; display:grid; place-items:center; font-size:12px; font-weight:800; box-shadow:0 2px 8px rgba(46,125,79,0.3);">·</div>
+          <button class="btn btn-ghost" id="signout-btn" style="font-size:14px; font-weight:600; color:var(--color-text-secondary);">Sign out</button>
+        </div>
+      </header>
+
+      <main class="container" style="max-width: 1060px; width: 100%; padding: 36px 32px 48px; margin: 0 auto;">
+        <!-- Spacious Top Greeting Header -->
+        <div class="hero-banner" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--glass-border);">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <span class="pulse-dot"></span>
+              <p class="text-muted" id="greeting" style="font-size:13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--color-brand-accent); margin:0;">Welcome back</p>
+            </div>
+            <h1 class="hero-title-xl" id="greeting-name" style="font-size:48px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.1; margin:0;">Your Workspaces</h1>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <div style="display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:var(--radius-pill); background:var(--glass-bg); border:1px solid var(--glass-border); font-size:13px; font-weight:600; color:var(--color-text-secondary);">
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--color-success); display:inline-block;"></span> Drive Sync Active
+            </div>
+            <button class="btn btn-primary" id="new-btn" style="font-family: var(--font-family); padding: 10px 22px; font-size: 14px; font-weight: 650; letter-spacing: -0.2px; border-radius: var(--radius-pill); background: var(--color-brand-accent); color: #FFFFFF; border: 1px solid color-mix(in srgb, var(--color-brand-accent) 80%, white); box-shadow: 0 4px 16px color-mix(in srgb, var(--color-brand-accent) 28%, transparent); display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer;"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg> Create New Workspace</button>
+          </div>
+        </div>
+
+
+
+        <!-- WORKSPACE DIRECTORY HERO HEADER WITH FILTER TABS -->
+        <div class="directory-hero-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-bottom:28px;">
+          <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+            <h2 style="font-size: 30px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.2; display:flex; align-items:center; gap:10px; margin:0;">Workspace Directory <span class="sparkle-accent" id="section-sparkle"></span></h2>
+            <div style="display:flex; align-items:center; gap:6px; padding:4px; border-radius:var(--radius-pill); background:var(--glass-bg); border:1px solid var(--glass-border);" id="filter-tabs">
+              <button type="button" id="tab-all" style="padding:5px 14px; border-radius:var(--radius-pill); background:var(--color-brand-accent); color:#fff; font-size:12px; font-weight:700; cursor:pointer; border:none; transition:all 0.15s ease;">All (<span id="count-all">0</span>)</button>
+              <button type="button" id="tab-public" style="padding:5px 14px; border-radius:var(--radius-pill); background:transparent; color:var(--color-text-secondary); font-size:12px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s ease;">Public Links (<span id="count-public">0</span>)</button>
+            </div>
+          </div>
+          <div style="position:relative; width:320px;">
+            <input type="text" id="search-input" placeholder="Search workspaces..." style="width:100%; padding:11px 76px 11px 40px; border-radius:var(--radius-pill); border:1px solid var(--glass-border); background:var(--glass-bg); color:var(--color-text-primary); font-size:14px; font-weight:500; outline:none; transition:all 0.2s ease; box-shadow:var(--shadow-xs);">
+            <span style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--color-text-secondary); pointer-events:none; font-size:14px;">🔍</span>
+            <button type="button" id="search-clear-btn" aria-label="Clear search" hidden style="position:absolute; right:48px; top:50%; transform:translateY(-50%); background:var(--color-surface-alt); border:1px solid var(--glass-border); border-radius:50%; width:20px; height:20px; display:grid; place-items:center; color:var(--color-text-secondary); cursor:pointer; font-size:11px; font-weight:800; padding:0;">✕</button>
+            <kbd style="position:absolute; right:14px; top:50%; transform:translateY(-50%); font-family:inherit; font-size:11px; font-weight:700; color:var(--color-text-secondary); background:var(--color-surface-alt); border:1px solid var(--glass-border); border-radius:4px; padding:2px 6px; pointer-events:none;">⌘K</kbd>
+          </div>
+        </div>
+
+        <div id="list" aria-live="polite" style="margin-bottom:44px;">
+          <div class="card card-glass skeleton" style="height:100px; border-radius:var(--radius-2xl);"></div>
+          <div class="card card-glass skeleton" style="height:100px; border-radius:var(--radius-2xl);"></div>
+        </div>
+
+
+
+        <div class="stat-row" id="stat-row" aria-live="polite">
+          <div class="stat-card">
+            <span class="stat-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4l1.5 2h6A1.5 1.5 0 0 1 17.5 8.5v8A1.5 1.5 0 0 1 16 18H4.5A1.5 1.5 0 0 1 3 16.5v-10Z"></path></svg></span>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span class="stat-value">2</span>
+              <span class="stat-label">Total Workspaces</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12a3.5 3.5 0 0 0 5 0l2-2a3.5 3.5 0 0 0-5-5l-1 1"></path><path d="M11 8a3.5 3.5 0 0 0 5 5l1-1"></path></svg></span>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span class="stat-value">1</span>
+              <span class="stat-label">Total Public Links</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h9A1.5 1.5 0 0 1 16 5.5v6A1.5 1.5 0 0 1 14.5 13H9l-3.5 3v-3H5.5A1.5 1.5 0 0 1 4 11.5v-6Z"></path></svg></span>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span class="stat-value">4</span>
+              <span class="stat-label">Total Comments</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Complete Multi-Column Glass Footer -->
+        <footer style="margin-top: 80px; padding: 48px 0 32px; border-top: 1px solid var(--glass-border);">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px;">
+            <div style="grid-column: span 1;">
+              <div class="brand" style="font-size:20px; font-weight:900; letter-spacing:-0.5px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                <span style="width:10px; height:10px; border-radius:50%; background:var(--color-brand-accent); box-shadow:0 0 12px var(--color-brand-accent);"></span>
+                Relay
+              </div>
+              <p class="text-muted" style="font-size:14px; max-width: 320px; line-height:1.6; margin:0;">
+                Direct media reviews and timestamped collaborative feedback by Deep Sauce Labs.
+              </p>
+            </div>
+            <div>
+              <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; color:var(--color-text-primary);">Product</div>
+              <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
+                <a href="/app" style="color:var(--color-text-secondary); text-decoration:none;">Workspaces</a>
+                <a href="/index.html#features" style="color:var(--color-text-secondary); text-decoration:none;">Features</a>
+                <a href="/index.html#workflow" style="color:var(--color-text-secondary); text-decoration:none;">How it works</a>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; color:var(--color-text-primary);">Studio & Apps</div>
+              <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
+                <a href="https://deepsaucelabs.com/" target="_blank" rel="noopener noreferrer" style="color:var(--color-text-secondary); text-decoration:none; transition:color 0.15s ease;">Deep Sauce Labs</a>
+                <a href="https://badaboom.app/" target="_blank" rel="noopener noreferrer" style="color:var(--color-brand-accent); font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px;">Badaboom <span style="font-size:10px; background:color-mix(in srgb, var(--color-brand-accent) 20%, transparent); padding:2px 6px; border-radius:var(--radius-pill); border:1px solid color-mix(in srgb, var(--color-brand-accent) 35%, transparent);">Featured</span></a>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; color:var(--color-text-primary);">Legal</div>
+              <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
+                <a href="https://deepsaucelabs.com/privacy" target="_blank" rel="noopener noreferrer" style="color:var(--color-text-secondary); text-decoration:none;">Privacy Policy</a>
+                <a href="#" style="color:var(--color-text-secondary); text-decoration:none;">Terms of Service</a>
+                <a href="#" style="color:var(--color-text-secondary); text-decoration:none;">Security</a>
+              </div>
+            </div>
+          </div>
+          <div style="padding-top: 24px; border-top: 1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; font-size:13px; color:var(--color-text-secondary);">
+            <div>© 2026 Deep Sauce Labs. All rights reserved.</div>
+            <div style="font-weight:600;">Built for video, audio & design workflows</div>
+          </div>
+        </footer>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- New workspace dialog -->
+  <dialog id="new-dialog" class="share-dialog">
+    <form id="new-form" method="dialog" style="padding:24px;">
+      <h2 style="font-size:19px; margin-bottom:16px;">New workspace</h2>
+      <div class="field">
+        <label for="w-name">Name</label>
+        <input id="w-name" required minlength="2" maxlength="100" />
+      </div>
+      <div class="field">
+        <label for="w-desc">Description (optional)</label>
+        <textarea id="w-desc" rows="2" maxlength="500"></textarea>
+      </div>
+      <div class="field">
+        <label for="w-url">Public Google Drive folder URL</label>
+        <input id="w-url" required placeholder="https://drive.google.com/drive/folders/..." />
+      </div>
+      <p class="error-text" id="new-error" role="alert"></p>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" class="btn btn-cancel" id="cancel-btn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="create-btn">Create workspace</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module">
+    import { api, toast, escapeHtml, toggleTheme, requireSession, initials, icon, confirmDialog } from '/js/shared.js';
+    import { initShareDialog } from '/js/share-dialog.js';
+
+    if (document.getElementById('nav-workspaces')) {
+      document.getElementById('nav-workspaces').innerHTML = icon('folder', { size: 18 });
+    }
+
+    function paintThemeIcon() {
+      document.getElementById('theme-btn').innerHTML = icon(document.documentElement.classList.contains('dark') ? 'sun' : 'moon', { size: 16 });
+    }
+    paintThemeIcon();
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      toggleTheme();
+      paintThemeIcon();
+    });
+    document.getElementById('signout-btn').addEventListener('click', async () => {
+      await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      window.location.href = '/login';
+    });
+    document.getElementById('section-sparkle').innerHTML = icon('sparkle', { size: 14 });
+
+    const listEl = document.getElementById('list');
+    const statRowEl = document.getElementById('stat-row');
+    const dialog = document.getElementById('new-dialog');
+    document.getElementById('new-btn').addEventListener('click', () => dialog.showModal());
+    document.getElementById('cancel-btn').addEventListener('click', () => dialog.close());
+
+    const STAT_ICONS = { workspaces: 'folder', links: 'link', comments: 'chat' };
+
+    function renderStats(stats) {
+      const cards = [
+        { key: 'workspaces', label: 'Total Workspaces', value: stats.totalWorkspaces },
+        { key: 'links', label: 'Total Public Links', value: stats.totalPublicLinks },
+        { key: 'comments', label: 'Total Comments', value: stats.totalComments },
+      ];
+      statRowEl.innerHTML = cards
+        .map(
+          c => `<div class="stat-card">
+            <span class="stat-icon">${icon(STAT_ICONS[c.key], { size: 16 })}</span>
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span class="stat-value">${c.value}</span>
+              <span class="stat-label">${c.label}</span>
+            </div>
+          </div>`,
+        )
+        .join('');
+    }
+
+    async function loadStats() {
+      try {
+        const stats = await api('/api/stats');
+        renderStats(stats);
+      } catch {
+        statRowEl.innerHTML = '';
+      }
+    }
+
+    function closeAllMenus() {
+      document.querySelectorAll('.card-menu.open').forEach(m => m.classList.remove('open'));
+      document.querySelectorAll('.workspace-tile.has-open-menu').forEach(t => t.classList.remove('has-open-menu'));
+    }
+    document.addEventListener('click', closeAllMenus);
+
+    function getPinnedIds() {
+      try {
+        return new Set(JSON.parse(localStorage.getItem('relay_pinned_workspaces') || '[]'));
+      } catch {
+        return new Set();
+      }
+    }
+
+    function togglePinWorkspace(id) {
+      const set = getPinnedIds();
+      if (set.has(id)) {
+        set.delete(id);
+        toast('Workspace unpinned');
+      } else {
+        set.add(id);
+        toast('Workspace pinned to top');
+      }
+      localStorage.setItem('relay_pinned_workspaces', JSON.stringify(Array.from(set)));
+      applySearchAndRender();
+    }
+
+    function render(workspaces) {
+      if (!workspaces.length) {
+        listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+          <div class="empty-icon">${icon('folder', { size: 26 })}</div>
+          <p>No workspaces yet.</p>
+          <p>Create one from a public Google Drive folder to get started.</p>
+        </div>`;
+        return;
+      }
+
+      const pinnedSet = getPinnedIds();
+      const sorted = [...workspaces].sort((a, b) => {
+        const aPinned = pinnedSet.has(a.id);
+        const bPinned = pinnedSet.has(b.id);
+        if (aPinned && !bPinned) return -1;
+        if (!aPinned && bPinned) return 1;
+        return 0;
+      });
+
+      listEl.innerHTML = sorted
+        .map(
+          w => {
+            const isPinned = pinnedSet.has(w.id);
+            return `<div class="card card-glass workspace-card ${isPinned ? 'is-pinned' : ''}" data-id="${w.id}" data-owner="${w.isOwner}">
+            <div class="workspace-card-header">
+              <div class="workspace-card-main">
+                <div class="workspace-icon-box">
+                  ${icon('folder', { size: 28 })}
+                </div>
+                <div class="workspace-info">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <a class="workspace-title-link" href="/app/workspaces/${w.id}">${escapeHtml(w.name)}</a>
+                    ${isPinned ? `<span style="font-size:11px; padding:2px 8px; border-radius:var(--radius-pill); background:color-mix(in srgb, var(--color-brand-accent) 18%, transparent); color:var(--color-brand-accent); font-weight:700; border:1px solid color-mix(in srgb, var(--color-brand-accent) 30%, transparent);">📌 Pinned</span>` : ''}
+                  </div>
+                  ${w.description ? `<p class="workspace-desc">${escapeHtml(w.description)}</p>` : ''}
+                </div>
+              </div>
+              <div class="card-menu">
+                <button type="button" class="card-menu-btn" data-action="toggle-menu" aria-label="Workspace actions">${icon('dots', { size: 16 })}</button>
+                <div class="card-menu-list">
+                  <button type="button" class="card-menu-item" data-action="share">${icon('link', { size: 15 })} Share public link</button>
+                  <button type="button" class="card-menu-item" data-action="pin">${icon('star', { size: 15 })} ${isPinned ? 'Unpin workspace' : 'Pin to top'}</button>
+                  ${w.isOwner ? `<div style="height:1px; background:var(--glass-border); margin:4px 0;"></div><button type="button" class="card-menu-item danger" data-action="delete">${icon('trash', { size: 15 })} Delete workspace</button>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="workspace-card-footer">
+              <div class="workspace-meta-left">
+                ${w.share_enabled ? `<span class="share-status-badge on"><span class="dot"></span>Public Link</span>` : `<span class="share-status-badge off"><span class="dot"></span>Private</span>`}
+              </div>
+              <span class="workspace-date">Created ${new Date(w.created_at).toLocaleDateString()}</span>
+            </div>
+          </div>`;
+          }
+        )
+        .join('');
+
+      listEl.querySelectorAll('.workspace-card-main').forEach(main => {
+        main.addEventListener('click', e => {
+          if (e.target.closest('.card-menu, .card-menu-btn, .card-menu-list, button')) return;
+          const card = main.closest('.workspace-card');
+          const id = card?.dataset.id;
+          if (id) window.location.href = `/app/workspaces/${id}`;
+        });
+      });
+
+      listEl.querySelectorAll('[data-action="toggle-menu"]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          const menu = btn.closest('.card-menu');
+          const tile = btn.closest('.workspace-card') || btn.closest('.workspace-tile');
+          const wasOpen = menu.classList.contains('open');
+          closeAllMenus();
+          if (!wasOpen) {
+            menu.classList.add('open');
+            if (tile) tile.classList.add('has-open-menu');
+          }
+        });
+      });
+
+      listEl.querySelectorAll('[data-action="share"]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeAllMenus();
+          const tile = btn.closest('.workspace-card') || btn.closest('.workspace-tile');
+          if (!tile) return;
+          const id = tile.dataset.id;
+          const nameEl = tile.querySelector('.workspace-title-link') || tile.querySelector('h3') || tile.querySelector('.workspace-title');
+          const name = nameEl ? nameEl.textContent.trim() : 'Workspace';
+          const dlg = initShareDialog({
+            workspaceId: id,
+            title: `Share "${name}"`,
+            description: 'Anyone with this public link can view and leave comments on this workspace.'
+          });
+          dlg.open();
+        });
+      });
+
+      listEl.querySelectorAll('[data-action="pin"]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeAllMenus();
+          const tile = btn.closest('.workspace-card') || btn.closest('.workspace-tile');
+          if (!tile) return;
+          const id = tile.dataset.id;
+          togglePinWorkspace(id);
+        });
+      });
+
+      listEl.querySelectorAll('[data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', async e => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeAllMenus();
+          const tile = btn.closest('.workspace-card') || btn.closest('.workspace-tile');
+          if (!tile) return;
+          const id = tile.dataset.id;
+          const nameEl = tile.querySelector('.workspace-title-link') || tile.querySelector('h3') || tile.querySelector('.workspace-title');
+          const name = nameEl ? nameEl.textContent.trim() : 'this workspace';
+          const firstOk = await confirmDialog({
+            title: `Delete "${name}"?`,
+            body: 'This permanently removes the workspace, its media references, comments, and markers. Files in Google Drive are not affected.',
+            confirmLabel: 'Delete permanently',
+            danger: true,
+          });
+          if (!firstOk) return;
+          try {
+            await api(`/api/workspaces/${id}`, { method: 'DELETE' });
+            toast('Workspace deleted');
+            load();
+            loadStats();
+          } catch (err) {
+            toast(err.message, { error: true });
+          }
+        });
+      });
+    }
+
+    let allWorkspaces = [];
+    let currentSearch = '';
+    let currentFilter = 'all';
+
+    function updateFilterCounts() {
+      const allCount = allWorkspaces.length;
+      const publicCount = allWorkspaces.filter(w => w.share_enabled).length;
+      const elAll = document.getElementById('count-all');
+      const elPublic = document.getElementById('count-public');
+      if (elAll) elAll.textContent = allCount;
+      if (elPublic) elPublic.textContent = publicCount;
+
+      const tabAll = document.getElementById('tab-all');
+      const tabPublic = document.getElementById('tab-public');
+      if (tabAll && tabPublic) {
+        if (currentFilter === 'all') {
+          tabAll.style.background = 'var(--color-brand-accent)';
+          tabAll.style.color = '#fff';
+          tabAll.style.fontWeight = '700';
+          tabPublic.style.background = 'transparent';
+          tabPublic.style.color = 'var(--color-text-secondary)';
+          tabPublic.style.fontWeight = '600';
+        } else {
+          tabPublic.style.background = 'var(--color-brand-accent)';
+          tabPublic.style.color = '#fff';
+          tabPublic.style.fontWeight = '700';
+          tabAll.style.background = 'transparent';
+          tabAll.style.color = 'var(--color-text-secondary)';
+          tabAll.style.fontWeight = '600';
+        }
+      }
+    }
+
+    function applySearchAndRender() {
+      const filtered = allWorkspaces.filter(w => {
+        const matchesSearch = !currentSearch || w.name.toLowerCase().includes(currentSearch.toLowerCase()) || (w.description && w.description.toLowerCase().includes(currentSearch.toLowerCase()));
+        const matchesFilter = currentFilter === 'all' || (currentFilter === 'public' && w.share_enabled);
+        return matchesSearch && matchesFilter;
+      });
+      render(filtered);
+      updateFilterCounts();
+    }
+
+    const searchInput = document.getElementById('search-input');
+    const searchClearBtn = document.getElementById('search-clear-btn');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', e => {
+        currentSearch = e.target.value.trim();
+        if (searchClearBtn) searchClearBtn.hidden = !e.target.value;
+        applySearchAndRender();
+      });
+    }
+
+    if (searchClearBtn && searchInput) {
+      searchClearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        currentSearch = '';
+        searchClearBtn.hidden = true;
+        searchInput.focus();
+        applySearchAndRender();
+      });
+    }
+
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInput?.focus();
+      }
+    });
+
+    document.getElementById('tab-all')?.addEventListener('click', () => {
+      currentFilter = 'all';
+      applySearchAndRender();
+    });
+
+    document.getElementById('tab-public')?.addEventListener('click', () => {
+      currentFilter = 'public';
+      applySearchAndRender();
+    });
+
+    async function load() {
+      try {
+        allWorkspaces = await api('/api/workspaces');
+        applySearchAndRender();
+      } catch (e) {
+        listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Couldn't load workspaces. <button class="btn btn-ghost" id="retry">Retry</button></div>`;
+        document.getElementById('retry')?.addEventListener('click', load);
+      }
+    }
+
+    document.getElementById('new-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const errorEl = document.getElementById('new-error');
+      const btn = document.getElementById('create-btn');
+      errorEl.textContent = '';
+      btn.disabled = true;
+      try {
+        await api('/api/workspaces', {
+          method: 'POST',
+          body: {
+            name: document.getElementById('w-name').value,
+            description: document.getElementById('w-desc').value,
+            driveUrl: document.getElementById('w-url').value,
+          },
+        });
+        dialog.close();
+        e.target.reset();
+        toast('Workspace created');
+        load();
+        loadStats();
+      } catch (err) {
+        errorEl.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    requireSession().then(session => {
+      if (!session) return;
+      const el = document.getElementById('sidebar-account');
+      const name = session.profile?.display_name || session.user?.email || 'there';
+      if (el) el.textContent = initials(name);
+      const hour = new Date().getHours();
+      const timeGreeting = hour >= 4 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 22 ? 'Good evening' : 'Welcome back';
+      document.getElementById('greeting').textContent = timeGreeting;
+      const nameEl = document.getElementById('greeting-name');
+      if (session.profile?.display_name) {
+        nameEl.innerHTML = `${escapeHtml(session.profile.display_name)} <span class="sparkle-accent">${icon('sparkle', { size: 18 })}</span>`;
+      } else {
+        nameEl.textContent = 'Your workspaces';
+      }
+      load();
+      loadStats();
+    });
+  </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=0b03114c-cac8-48dd-9879-2111cd55959d"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

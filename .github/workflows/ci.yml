@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Unit tests (zero dependencies, no network needed)
+        run: npm test
+
+      - name: Boot smoke test
+        run: |
+          cat > .env <<EOF
+          NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
+          GOOGLE_API_KEY=placeholder
+          PORT=3000
+          NODE_ENV=production
+          EOF
+          node --env-file=.env server.js &
+          sleep 1
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/)
+          if [ "$status" != "200" ]; then echo "landing page did not return 200 (got $status)"; exit 1; fi
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/app)
+          if [ "$status" != "302" ]; then echo "unauthenticated /app should redirect (got $status)"; exit 1; fi

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workspace — Relay</title>
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('theme');
+        var dark = saved ? saved === 'dark' : true;
+        if (dark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div class="shell-content">
+      <header class="topbar">
+        <a class="brand" href="/app">Relay</a>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-ghost btn-icon" id="theme-btn" aria-label="Toggle theme"></button>
+          <div class="sidebar-account" id="sidebar-account" title="Account" style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, var(--color-brand-accent), #1B5E3A); color:#FFF; display:grid; place-items:center; font-size:12px; font-weight:800; box-shadow:0 2px 8px rgba(46,125,79,0.3);">·</div>
+          <button class="btn btn-ghost" id="signout-btn">Sign out</button>
+        </div>
+      </header>
+
+      <main class="container" style="max-width: 1060px; width: 100%; margin: 0 auto; padding: 32px 32px 48px; position:relative;">
+        <a href="/app" class="btn btn-ghost" style="display:inline-flex; align-items:center; gap:6px; margin-bottom:16px; padding:6px 14px; border-radius:var(--radius-pill); font-size:13px; font-weight:600; text-decoration:none;">← Workspaces</a>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin: 0 0 24px; flex-wrap:wrap; gap:16px;">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <h1 id="w-name" style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin:0;">Loading…</h1>
+            <span class="share-status-badge off" id="visibility-badge" hidden><span class="dot"></span><span id="visibility-badge-text">Private</span></span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <button class="btn btn-ghost" id="share-btn" hidden style="gap:6px; border-radius:var(--radius-pill); padding:8px 18px; font-weight:600;"></button>
+            <button class="btn btn-primary" id="sync-btn" style="gap:6px; border-radius:var(--radius-pill); padding:10px 22px; font-weight:600; box-shadow:0 4px 16px rgba(46,125,79,0.3);"></button>
+          </div>
+        </div>
+        <div id="grid" class="grid grid-3" aria-live="polite">
+          <div class="card skeleton" style="aspect-ratio:16/9; border-radius:var(--radius-2xl);"></div>
+          <div class="card skeleton" style="aspect-ratio:16/9; border-radius:var(--radius-2xl);"></div>
+          <div class="card skeleton" style="aspect-ratio:16/9; border-radius:var(--radius-2xl);"></div>
+        </div>
+
+        <div id="danger-zone" hidden style="margin-top:56px; padding-top:24px; border-top:1px solid var(--color-border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <span class="text-muted" style="font-size:12px; font-weight:500;">Permanently remove this workspace and its comments</span>
+          <button class="btn btn-ghost" id="delete-workspace-btn" style="color:var(--color-danger); font-size:13px; font-weight:600; padding:6px 14px; gap:6px; border-radius:var(--radius-pill);"></button>
+        </div>
+
+        <span class="sparkle-accent" style="position:absolute; right:8px; bottom:-4px; opacity:0.35;" id="corner-sparkle"></span>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { api, toast, escapeHtml, toggleTheme, requireSession, confirmDialog, initials, icon } from '/js/shared.js';
+    import { initShareDialog } from '/js/share-dialog.js';
+
+    document.getElementById('share-btn').innerHTML = icon('share', { size: 15 }) + 'Share';
+    document.getElementById('sync-btn').innerHTML = icon('sync', { size: 15 }) + 'Sync from Drive';
+    document.getElementById('delete-workspace-btn').innerHTML = icon('trash', { size: 14 }) + 'Delete workspace';
+    document.getElementById('corner-sparkle').innerHTML = icon('sparkle', { size: 22 });
+
+    function paintThemeIcon() {
+      document.getElementById('theme-btn').innerHTML = icon(document.documentElement.classList.contains('dark') ? 'sun' : 'moon', { size: 16 });
+    }
+    paintThemeIcon();
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      toggleTheme();
+      paintThemeIcon();
+    });
+    document.getElementById('signout-btn').addEventListener('click', async () => {
+      await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      window.location.href = '/login';
+    });
+
+    const id = location.pathname.split('/').filter(Boolean).pop();
+    const grid = document.getElementById('grid');
+    const syncBtn = document.getElementById('sync-btn');
+    const shareBtn = document.getElementById('share-btn');
+    const KIND_ICON = { video: 'video', audio: 'music', image: 'image' };
+
+    const shareDialog = initShareDialog({
+      workspaceId: id,
+      title: 'Share workspace',
+      description: 'Anyone with the link can view every file in this workspace and leave comments — no account needed.',
+    });
+    shareBtn.addEventListener('click', () => shareDialog.open());
+
+    function getMediaPreview(m) {
+      const kind = (m.media_kind || 'video').toLowerCase();
+      let fallbackGraphic = '';
+
+      if (kind === 'audio') {
+        fallbackGraphic = `
+          <div class="thumb-fallback-canvas audio-canvas">
+            <div class="soundwave-bars">
+              <span style="height:14px;"></span><span style="height:28px;"></span><span style="height:20px;"></span><span style="height:36px;"></span><span style="height:24px;"></span><span style="height:30px;"></span><span style="height:16px;"></span>
+            </div>
+            <div class="thumb-fallback-icon">${icon('music', { size: 24 })}</div>
+          </div>`;
+      } else if (kind === 'video') {
+        fallbackGraphic = `
+          <div class="thumb-fallback-canvas video-canvas">
+            <div class="thumb-play-btn">${icon('play', { size: 22 })}</div>
+          </div>`;
+      } else {
+        fallbackGraphic = `
+          <div class="thumb-fallback-canvas image-canvas">
+            <div class="thumb-fallback-icon">${icon('image', { size: 28 })}</div>
+          </div>`;
+      }
+
+      const imgTag = m.thumbnail_url
+        ? `<img src="${escapeHtml(m.thumbnail_url)}" alt="${escapeHtml(m.name)}" loading="lazy" class="thumb-img"
+             onload="this.classList.add('loaded')" onerror="this.classList.add('failed');" />`
+        : '';
+
+      return `<div class="thumb thumb-${kind}">
+        ${fallbackGraphic}
+        ${imgTag}
+        <span class="media-badge">${escapeHtml((m.media_kind || 'file').toUpperCase())}</span>
+      </div>`;
+    }
+
+    function render(workspace, media) {
+      document.getElementById('w-name').textContent = workspace.name;
+      document.title = `${workspace.name} — Relay`;
+      const badge = document.getElementById('visibility-badge');
+      badge.hidden = false;
+      badge.classList.toggle('on', workspace.share_enabled);
+      badge.classList.toggle('off', !workspace.share_enabled);
+      document.getElementById('visibility-badge-text').textContent = workspace.share_enabled ? 'Public' : 'Private';
+      if (workspace.isOwner) {
+        shareBtn.hidden = false;
+        document.getElementById('danger-zone').hidden = false;
+      }
+      if (!media.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+          <div class="empty-icon">${icon('folder', { size: 26 })}</div>
+          <p>No media found yet.</p>
+          <p>Click "Sync from Drive" to scan the folder.</p>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = media
+        .map(m => `<a class="card card-glass media-tile" href="/app/workspaces/${id}/media/${m.id}">
+            ${getMediaPreview(m)}
+            <div class="meta">
+              <div class="meta-title">${escapeHtml(m.name)}</div>
+              <div class="meta-sub">
+                <span class="text-muted" style="font-size:12px; font-weight:600;">Media file</span>
+                <span class="meta-action">Review →</span>
+              </div>
+            </div>
+          </a>`)
+        .join('');
+    }
+
+    async function load() {
+      try {
+        const { workspace, media } = await api(`/api/workspaces/${id}`);
+        render(workspace, media);
+      } catch (e) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+          <p>Couldn't load this workspace.</p>
+          <button class="btn btn-ghost" id="retry">Try again</button>
+        </div>`;
+        document.getElementById('retry')?.addEventListener('click', load);
+      }
+    }
+
+    syncBtn.addEventListener('click', async () => {
+      syncBtn.disabled = true;
+      const original = syncBtn.innerHTML;
+      syncBtn.innerHTML = '<span class="spinner"></span> Syncing…';
+      try {
+        const { count } = await api(`/api/workspaces/${id}/sync`, { method: 'POST' });
+        toast(`Synced ${count} file${count === 1 ? '' : 's'}`);
+        await load();
+      } catch (e) {
+        toast(e.message, { error: true });
+      } finally {
+        syncBtn.disabled = false;
+        syncBtn.innerHTML = original;
+      }
+    });
+
+    // ---- Delete workspace ----
+    document.getElementById('delete-workspace-btn').addEventListener('click', async () => {
+      const firstOk = await confirmDialog({
+        title: 'Delete this workspace?',
+        body: 'This permanently removes the workspace, its media references, comments, and markers. Files in Google Drive are not affected.',
+        confirmLabel: 'Continue',
+        danger: true,
+      });
+      if (!firstOk) return;
+      const secondOk = await confirmDialog({
+        title: 'Are you absolutely sure?',
+        body: 'This is your last chance to back out — the workspace and everything in it will be gone for good.',
+        confirmLabel: 'Delete permanently',
+        danger: true,
+      });
+      if (!secondOk) return;
+      try {
+        await api(`/api/workspaces/${id}`, { method: 'DELETE' });
+        toast('Workspace deleted');
+        window.location.href = '/app';
+      } catch (e) {
+        toast(e.message, { error: true });
+      }
+    });
+
+    requireSession().then(session => {
+      if (!session) return;
+      const el = document.getElementById('sidebar-account');
+      if (el) el.textContent = initials(session.profile?.display_name || session.user?.email || '?');
+      load();
+    });
+  </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=0b03114c-cac8-48dd-9879-2111cd55959d"></script>
+<!-- impeccable-live-end -->
+</body>
+</html>

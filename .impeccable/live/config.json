@@ -1,0 +1,14 @@
+{
+  "files": [
+    "public/index.html",
+    "public/app.html",
+    "public/review.html",
+    "public/media.html",
+    "public/login.html",
+    "public/workspace.html",
+    "public/review-media.html"
+  ],
+  "insertBefore": "</body>",
+  "commentSyntax": "html",
+  "cspChecked": true
+}

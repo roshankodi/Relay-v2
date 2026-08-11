@@ -1,0 +1,95 @@
+/*
+ * Relay design tokens — Light & Dark Mode System
+ */
+:root {
+  /* Color — Minty & White High-Fidelity Light Mode */
+  --color-brand: #227C44;
+  --color-brand-accent: #288E4F;
+  --color-success: #388E3C;
+  --color-danger: #D9483B;
+  --color-bg-gradient-start: #EBF7F0;
+  --color-bg-gradient-end: #DFF3E7;
+  --color-surface: rgba(223, 243, 231, 0.85);
+  --color-surface-alt: rgba(205, 236, 216, 0.90);
+  --color-sidebar-bg: #141715;
+  --color-sidebar-text: #969C97;
+  --color-sidebar-text-active: #FFFFFF;
+  --color-text-primary: #102619;
+  --color-text-secondary: #2E503B;
+  --color-border: rgba(35, 110, 60, 0.20);
+  --color-on-accent: #FFFFFF;
+  --color-focus-ring: 0 0 0 3px rgba(34, 124, 68, 0.3);
+
+  /* Glass & Atmosphere — Minty Light Theme */
+  --glass-bg: rgba(223, 243, 231, 0.75);
+  --glass-border: rgba(35, 110, 60, 0.22);
+  --glass-blur: 24px;
+  --glow-brand: 0 10px 32px rgba(34, 124, 68, 0.16);
+  --orb-1: rgba(40, 142, 79, 0.18);
+  --orb-2: rgba(25, 95, 50, 0.12);
+  --grid-line: rgba(30, 100, 55, 0.04);
+
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-3xl: 34px;
+  --radius-pill: 9999px;
+
+  /* Shadow */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 23, 19, 0.06);
+  --shadow-lg: 0 16px 44px rgba(15, 23, 19, 0.08);
+
+  /* Typography */
+  --font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  --text-xs: 13px;
+  --text-sm: 14px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 24px;
+  --text-xl: 34px;
+}
+
+.dark {
+  --color-brand: #2E7D4F;
+  --color-brand-accent: #4CAF6B;
+  --color-success: #4CAF50;
+  --color-danger: #E8756A;
+  --color-bg-gradient-start: #0B0E0C;
+  --color-bg-gradient-end: #0E1210;
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-surface-alt: rgba(255, 255, 255, 0.08);
+  --color-sidebar-bg: #121614;
+  --color-sidebar-text: #8E9690;
+  --color-sidebar-text-active: #FFFFFF;
+  --color-text-primary: #F2F4F3;
+  --color-text-secondary: #8E9690;
+  --color-border: rgba(255, 255, 255, 0.09);
+  --color-on-accent: #FFFFFF;
+  --color-focus-ring: 0 0 0 3px rgba(76, 175, 107, 0.35);
+
+  /* Glass & Atmosphere — Clean Dark Theme */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-blur: 20px;
+  --glow-brand: 0 0 32px rgba(76, 175, 107, 0.14);
+  --orb-1: rgba(76, 175, 107, 0.12);
+  --orb-2: rgba(46, 125, 79, 0.08);
+  --grid-line: rgba(255, 255, 255, 0.04);
+
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.60);
+}
