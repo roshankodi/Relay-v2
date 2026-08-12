@@ -1,66 +1,48 @@
-<div align="center">
+# Relay
 
-  <br />
-  <img src="public/favicon.svg" alt="Relay Logo" width="84" height="84" />
-  
-  # Relay — Next-Gen Frame-Accurate Media Reviews
+> **Next-Gen Frame-Accurate Media Reviews Directly from Google Drive**
 
-  <p align="center">
-    <strong>Review video, audio, and image assets directly from Google Drive — zero downloads required.</strong>
-  </p>
-
-  <p align="center">
-    <a href="https://relay-v2.onrender.com" target="_blank">
-      <img src="https://img.shields.io/badge/🌐_Live_Production-https%3A%2F%2Frelay--v2.onrender.com-2E7D4F?style=for-the-badge&logo=render&logoColor=white" alt="Live Demo" />
-    </a>
-  </p>
-
-  <p align="center">
-    <img src="https://img.shields.io/badge/Node.js-v18+-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js" />
-    <img src="https://img.shields.io/badge/Dependencies-0-brightgreen?style=flat-square" alt="Zero Dependencies" />
-    <img src="https://img.shields.io/badge/Supabase-Auth_%26_RLS-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
-    <img src="https://img.shields.io/badge/Mobile-100%25_Responsive-4CAF6B?style=flat-square" alt="Mobile Responsive" />
-  </p>
-
-  <br />
-
-</div>
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://relay-dsl.vercel.app/)
+[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Auth_%26_PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
 
 ---
 
-## ⚡ Overview
+## Executive Summary
 
-**Relay** is a high-fidelity, zero-dependency media review platform engineered for creative teams, video editors, and agency clients. Reviewers leave timestamped comments, drag timeline range selections (`0:15–0:20`), and collaborate seamlessly on assets hosted directly in your public Google Drive.
+**Relay** is an enterprise-grade media review platform engineered for creative teams, video editors, and agency clients. It enables reviewers to leave frame-accurate timestamped comments, drag timeline range selections (`0:15–0:20`), and collaborate on video, audio, and visual assets stored directly within Google Drive — eliminating file downloads, duplication, and extra storage costs.
 
-> 🌐 **Live Production Link**: **[https://relay-v2.onrender.com](https://relay-v2.onrender.com)**
-
----
-
-## ✨ Core Highlights
-
-- ⏱ **Frame-Accurate Feedback**: Comment at exact timestamps or drag timeline handles for range feedback.
-- 📂 **Stays in Google Drive**: Reads directly from public Drive folders. No file re-uploading or duplicate storage fees.
-- 🔗 **Share Without Friction**: Share secure 128-bit review links. Reviewers add their name once and start commenting — no account required.
-- 🎵 **Multi-Format Fallback Previews**: Type-specific preview canvases for video, audio, and image assets.
-- ⚡ **Zero-Build Architecture**: Pure Node.js HTTP server and vanilla HTML/CSS/JS. Zero heavy bundler configurations or npm security vulnerabilities.
-- 📱 **Mobile-First Responsive**: 100% fluid interface tailored for small phones, tablets, laptops, and large desktop screens.
-- 🌓 **Flash-Free Theme Engine**: Instant, zero-flicker dark & light mode switching.
+- **Production Live Link**: **[https://relay-dsl.vercel.app](https://relay-dsl.vercel.app/)**
+- **Architecture**: Zero-dependency Serverless Node.js Engine (`@vercel/node`) + Vanilla HTML5/CSS3/ES Modules.
 
 ---
 
-## 🛠 Tech Stack & Architecture
+## Key Capabilities
 
-| Layer | Technology |
+- **Frame-Accurate Feedback**: Anchor comments to exact video timestamps or multi-second range selections (`0:15–0:20`).
+- **Native Google Drive Streaming**: Reads directly from public Drive folders via Google REST APIs. Assets stay in Drive; no re-uploading or cloud duplication.
+- **Frictionless Share Links**: Share secure 128-bit review links. External reviewers enter a display name once and collaborate without creating an account.
+- **Multi-Format Previews**: Type-specific preview canvases for video, audio, and image assets with WebKit fallback rendering.
+- **Zero-Dependency Architecture**: Built without heavy bundlers or external framework bloat. Plain Node.js runtime ensuring zero vulnerability surface area.
+- **Mobile-First Responsive**: Fully responsive across mobile (320px–480px), tablet (481px–1024px), and desktop (1025px+) viewports.
+- **Flash-Free Theme Initialization**: Instant, zero-flicker dark/light mode switching executing synchronously before initial paint.
+
+---
+
+## Technical Architecture & Stack
+
+| Component | Specification |
 |---|---|
-| **Runtime** | Pure Node.js (v18+) with native modules (`node:http`, `node:crypto`, `fetch`) |
-| **Frontend** | Vanilla HTML5 / CSS3 (Minty Glass Design System) / ES Modules |
+| **Runtime & Hosting** | Node.js (v18+) Serverless Runtime deployed on **Vercel** (`@vercel/node`) |
+| **Frontend Shell** | Vanilla HTML5 / CSS3 (Minty Glass Token System) / Native ES Modules |
 | **Authentication** | Supabase Auth (OAuth 2.0 Google Integration & Passwordless Sessions) |
-| **Database** | PostgreSQL + Row Level Security (RLS) via PostgREST |
-| **Storage Engine** | Google Drive v3 REST API |
+| **Database & Security** | PostgreSQL + Row Level Security (RLS) via PostgREST |
+| **Cloud Media API** | Google Drive v3 REST API |
 
-```
+```text
 relay/
-├── server.js                # High-performance zero-dependency HTTP server
+├── vercel.json              # Vercel serverless deployment specification
+├── server.js                # High-performance Node.js HTTP router & API controller
 ├── lib/
 │   ├── supabase.js          # Direct Supabase Auth & PostgREST fetch client
 │   ├── drive.js             # Google Drive v3 REST API integration
@@ -68,76 +50,67 @@ relay/
 │   ├── validate.js          # Server-side input validation engine
 │   ├── cookies.js           # Cookie parsing & serialization
 │   └── ratelimit.js         # Per-instance rate limiting
-├── public/                  # Flash-free front-end application
-│   ├── index.html           # Landing page & interactive hero demo
+├── public/                  # Static frontend application
+│   ├── index.html           # Landing page & interactive hero preview
 │   ├── app.html             # Workspace directory & stats dashboard
 │   ├── workspace.html       # Media grid & Google Drive sync engine
-│   ├── media.html           # Professional video/audio player & review stage
+│   ├── media.html           # Video/audio player & review stage
 │   ├── login.html           # Glassmorphic auth portal
 │   ├── styles.css           # Minty glass design system & mobile breakpoints
 │   └── favicon.svg          # Custom vector brand icon
-└── supabase/migrations/     # Database schema & Row Level Security (RLS)
+└── supabase/migrations/     # PostgreSQL schema & RLS security policies
 ```
 
 ---
 
-## 🚀 Quick Start
+## Getting Started
 
-### 1. Clone & Setup
+### Prerequisites
+- **Node.js**: v18.0.0 or higher
+- **Supabase Account**: Project URL and Anon Key
+- **Google Drive API Key**: Scoped for Google Drive v3 REST API
 
-```bash
-git clone https://github.com/YOUR_USERNAME/relay.git
-cd relay
-cp .env.example .env
-```
+### Local Development
 
-### 2. Environment Configuration
+1. **Clone Repository**:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/relay.git
+   cd relay
+   ```
 
-Configure your `.env` variables:
+2. **Configure Environment Variables**:
+   Create a `.env` file in the root directory:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-id.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   GOOGLE_API_KEY=your-google-drive-api-key
+   PORT=3000
+   NODE_ENV=development
+   ```
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-id.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-GOOGLE_API_KEY=your-google-drive-api-key
-PORT=3000
-NODE_ENV=development
-```
+3. **Start Development Server**:
+   ```bash
+   npm run dev
+   ```
+   Navigate to `http://localhost:3000`.
 
-### 3. Launch Locally
-
-```bash
-npm run dev
-```
-
-Open **`http://localhost:3000`** in your browser.
-
----
-
-## 🧪 Unit Tests
-
-Run the built-in Node.js test suite:
-
-```bash
-npm test
-```
+4. **Execute Test Suite**:
+   ```bash
+   npm test
+   ```
 
 ---
 
-## 🔒 Security Model
+## Security Model
 
-- **Row Level Security (RLS)**: Database queries are subject to PostgreSQL RLS policies matching the user's session token.
-- **Guest Capabilities**: Anonymous guest reviewers receive a 128-bit token stored in `localStorage` to authorize editing/deleting their own comments.
-- **Zero Service-Role Key**: No administrative service-role keys are exposed or used by the server.
+- **Row Level Security (RLS)**: Access control is strictly enforced at the PostgreSQL layer matching the authenticated user's session token.
+- **Capability Tokens**: Anonymous guest reviewers are issued 128-bit random tokens persisted in `localStorage` to authorize editing/deleting their own comments.
+- **Zero Superuser Exposure**: Server requests execute under user-scoped tokens without exposing administrative service-role keys.
 
 ---
 
-<br />
+## Author & Credits
 
-<div align="center">
-  <p align="center">
-    Crafted with ❤️ by <strong>Roshan</strong> @ <strong>Deep Sauce Labs</strong>
-  </p>
-  <p align="center">
-    <sub>© 2026 Deep Sauce Labs. All rights reserved.</sub>
-  </p>
-</div>
+Designed & Developed by **Roshan** at **Deep Sauce Labs**.
+
+© 2026 Deep Sauce Labs. All rights reserved.
