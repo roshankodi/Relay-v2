@@ -159,7 +159,7 @@
         <label for="w-url">Public Google Drive folder URL</label>
         <input id="w-url" required placeholder="https://drive.google.com/drive/folders/..." />
       </div>
-      <p class="error-text" id="new-error" role="alert"></p>
+      <p class="error-text" id="new-error" role="alert" style="color:var(--color-danger); font-size:13px; margin:8px 0; font-weight:600;"></p>
       <div style="display:flex; justify-content:flex-end; gap:8px;">
         <button type="button" class="btn btn-cancel" id="cancel-btn">Cancel</button>
         <button type="submit" class="btn btn-primary" id="create-btn">Create workspace</button>
@@ -488,15 +488,22 @@
       e.preventDefault();
       const errorEl = document.getElementById('new-error');
       const btn = document.getElementById('create-btn');
+      const urlVal = document.getElementById('w-url').value.trim();
       errorEl.textContent = '';
+
+      if (!urlVal.includes('drive.google.com') && !urlVal.includes('folders/')) {
+        errorEl.textContent = 'Please enter a valid Google Drive folder link (e.g. https://drive.google.com/drive/folders/...)';
+        return;
+      }
+
       btn.disabled = true;
       try {
         await api('/api/workspaces', {
           method: 'POST',
           body: {
-            name: document.getElementById('w-name').value,
-            description: document.getElementById('w-desc').value,
-            driveUrl: document.getElementById('w-url').value,
+            name: document.getElementById('w-name').value.trim(),
+            description: document.getElementById('w-desc').value.trim(),
+            driveUrl: urlVal,
           },
         });
         dialog.close();
@@ -505,7 +512,7 @@
         load();
         loadStats();
       } catch (err) {
-        errorEl.textContent = err.message;
+        errorEl.textContent = err.message || 'Unable to create workspace. Check that your Drive folder is public.';
       } finally {
         btn.disabled = false;
       }

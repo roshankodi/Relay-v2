@@ -122,14 +122,18 @@ function apiError(res, e, fallback, status = 400) {
   if (e instanceof ValidationError) return json(res, 422, { error: e.message });
   if (e instanceof SupabaseApiError) {
     console.error(fallback, e.status, e.message);
-    // 401/403 from PostgREST usually means "not a member" (or "not the
-    // owner of this row") thanks to RLS — safe to surface as a generic
-    // forbidden rather than a 500.
     if (e.status === 401 || e.status === 403) return json(res, 403, { error: 'Not allowed' });
-    return json(res, status, { error: fallback });
+    if (e.status === 409 || (e.message && e.message.includes('unique constraint'))) {
+      return json(res, 409, { error: 'You have already added this Google Drive folder as a workspace.' });
+    }
+    return json(res, status, { error: e.message || fallback });
+  }
+  if (e?.message && e.message.includes('unique constraint')) {
+    return json(res, 409, { error: 'You have already added this Google Drive folder as a workspace.' });
   }
   console.error(fallback, e);
-  return json(res, status, { error: fallback });
+  const userMessage = e?.message && !e.message.includes('object') ? e.message : fallback;
+  return json(res, status, { error: userMessage });
 }
 
 async function requireApiUser(req, res) {
