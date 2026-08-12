@@ -1,123 +1,129 @@
-# Relay — Drive media reviews
+<div align="center">
 
-Review video, audio, and image files straight from a public Google Drive
-folder: timestamped comments, timeline range markers, and click-to-annotate
-image markers, shared with your team.
+  <br />
+  <img src="public/favicon.svg" alt="Relay Logo" width="80" height="80" />
+  
+  # Relay — Next-Gen Frame-Accurate Media Reviews
 
-## Why this version looks different
+  <p align="center">
+    <strong>Review video, audio, and image assets straight from your Google Drive — zero downloads required.</strong>
+  </p>
 
-This is a rebuild of a previous Next.js/React version, done specifically to
-eliminate an entire category of failure: **there is no build step and no
-npm package to install.** The server is plain Node.js using only built-in
-modules (`node:http`, `fetch`, etc.); the frontend is plain HTML/CSS/JS
-served as-is. `package.json` has zero dependencies. If something breaks now,
-it's an actual application bug you can see in `server.js` — not a dependency
-resolution failure, a bundler config issue, or a framework version mismatch.
+  <p align="center">
+    <a href="https://relay-v2.onrender.com" target="_blank">
+      <img src="https://img.shields.io/badge/🌐_Live_Demo-https%3A%2F%2Frelay--v2.onrender.com-2E7D4F?style=for-the-badge&logo=render&logoColor=white" alt="Live Demo" />
+    </a>
+  </p>
 
-Trade-offs made to get there:
-- **No React** — pages are static HTML with small `<script type="module">`
-  blocks calling a JSON API.
-- **No Supabase SDK** — the server talks to Supabase's Auth and PostgREST
-  HTTP APIs directly via `fetch`. Same database, same Row Level Security
-  policies, same behavior — just no SDK dependency.
-- **No `googleapis` package** — Drive folder scanning calls the Drive v3
-  REST API directly.
-- **No realtime websocket subscription** — the review page polls for new
-  comments every 5 seconds instead of subscribing to Supabase Realtime.
-  Simpler and dependency-free; the trade-off is a few seconds of latency on
-  a new comment showing up for other reviewers.
+  <p align="center">
+    <img src="https://img.shields.io/badge/Node.js-v18+-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js" />
+    <img src="https://img.shields.io/badge/Dependencies-0-brightgreen?style=flat-square" alt="Zero Dependencies" />
+    <img src="https://img.shields.io/badge/Supabase-Auth_%26_RLS-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
+    <img src="https://img.shields.io/badge/Mobile-100%25_Responsive-4CAF6B?style=flat-square" alt="Mobile Responsive" />
+  </p>
 
-Everything else — the database schema, RLS policies, validation rules,
-comment-anchor model (exactly one of timestamp / range / image marker per
-comment) — is unchanged from the previous version.
+  <br />
 
-## Security note
+</div>
 
-If you're picking this project up after a prior review or a shared zip
-export, rotate your Supabase anon key and any Google API key that was ever
-included in a file you shared with someone else — treat anything that left
-your machine as compromised, regardless of git history.
+---
 
-## Quick start
+## ⚡ Overview
 
-```bash
-npm install        # no-op today — kept here for when/if a dependency is ever added
-cp .env.example .env
-# edit .env with your Supabase project URL/anon key and a Drive-restricted Google API key
-npm run dev         # http://localhost:3000, auto-restarts on file changes
+**Relay** is a high-fidelity, zero-dependency media review platform built for creative teams, video editors, and agency clients. Reviewers drop timestamped comments, drag timeline range selections, and leave visual annotations directly on media files stored in your public Google Drive.
+
+> 🚀 **Live Production Link**: **[https://relay-v2.onrender.com](https://relay-v2.onrender.com)**
+
+---
+
+## ✨ Key Features
+
+- ⏱ **Frame-Accurate Feedback**: Comment at exact video timestamps or drag to select range markers (`0:15–0:20`).
+- 📂 **Stays in Google Drive**: Relay reads directly from public Drive folders. No file re-uploading, duplicating, or storage costs.
+- 🔗 **Share Without Friction**: Share a 128-bit secure review link. Reviewers enter their name once and start commenting — no signup required.
+- 🎵 **Multi-Format Previews**: Native video stage, audio waveform player, and image review with fallback canvases.
+- ⚡ **Zero-Build Architecture**: Pure Node.js HTTP server and vanilla HTML/CSS/JS. Zero heavy bundlers, zero npm dependency vulnerabilities.
+- 📱 **Mobile-First Responsive**: 100% fluid mobile, tablet, and desktop interface with touch-friendly 44px tap targets.
+- 🌓 **Flash-Free Theme Engine**: Instant, zero-flicker dark & light mode switching.
+
+---
+
+## 🛠 Project Architecture
+
+```
+relay/
+├── server.js                # High-performance zero-dependency HTTP server
+├── lib/
+│   ├── supabase.js          # Direct Supabase Auth & PostgREST fetch client
+│   ├── drive.js             # Google Drive REST API integration
+│   ├── session.js           # Secure cookie session management
+│   ├── validate.js          # Strict server-side input validation
+│   ├── cookies.js           # Cookie parsing utility
+│   └── ratelimit.js         # In-memory rate limiting engine
+├── public/                  # Flash-free front-end application
+│   ├── index.html           # Landing page & interactive hero preview
+│   ├── app.html             # Workspace directory & stats dashboard
+│   ├── workspace.html       # Media grid & Google Drive sync engine
+│   ├── media.html           # Professional video/audio player & review stage
+│   ├── login.html           # Glassmorphic auth portal
+│   ├── styles.css           # Minty glass design system & mobile breakpoints
+│   └── favicon.svg          # Custom vector brand icon
+└── supabase/migrations/     # Database schema & Row Level Security (RLS)
 ```
 
-Run the test suite (pure unit tests, no network or credentials required):
+---
+
+## 🚀 Quick Start
+
+### 1. Clone & Setup Environment
+
+```bash
+git clone https://github.com/YOUR_USERNAME/relay.git
+cd relay
+cp .env.example .env
+```
+
+### 2. Configure Environment Variables
+
+Edit `.env` with your credentials:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+GOOGLE_API_KEY=your-google-drive-api-key
+PORT=3000
+NODE_ENV=development
+```
+
+### 3. Run Locally
+
+```bash
+npm run dev
+```
+
+Visit **`http://localhost:3000`** in your browser.
+
+---
+
+## 🧪 Unit Tests
+
+Run the dependency-free Node.js unit test suite:
 
 ```bash
 npm test
 ```
 
-## Project layout
+---
 
-```
-server.js            HTTP server: routing, static files, JSON API
-lib/
-  supabase.js         Auth + PostgREST calls via fetch (no SDK)
-  drive.js             Google Drive v3 REST calls via fetch (no SDK)
-  session.js            Cookie-based session + token refresh
-  validate.js            Input validation (mirrors the DB constraints)
-  cookies.js               Cookie parsing/serialization
-  ratelimit.js               Per-instance in-memory rate limiting
-public/               Static HTML/CSS/JS — no build step
-supabase/migrations/  Database schema + RLS policies (unchanged)
-tests/                node:test unit tests
-```
+## 🔒 Security & Capability Model
 
-## Database setup
+- **Row Level Security (RLS)**: Database access is strictly governed by Supabase RLS policies.
+- **Guest Capabilities**: Anonymous guest comments use 128-bit capability tokens stored locally in the reviewer's browser, preventing unauthorized comment tampering.
+- **Zero Service-Role Leaks**: Database queries run with the user's own session token.
 
-Apply both migrations in `supabase/migrations/`, in order, via the SQL
-Editor or `supabase db push`:
-- `0001_initial.sql` — core schema (`profiles`, `workspaces`,
-  `workspace_members`, `media`, `comments`) with Row Level Security
-  restricting everything to workspace members, and a trigger that creates
-  a `profiles` row on signup.
-- `0002_sharing_and_guests.sql` — adds public workspace sharing and guest
-  commenting (no account required). **Read the comment block at the top
-  of that file** — it documents the security model (share tokens, guest
-  capability tokens), since it changes how access control works for
-  anyone using a share link.
+---
 
-## Public sharing & guest commenting
-
-A workspace owner can turn on a public share link from the Share button on
-a workspace page. Anyone with that link can view media and comment without
-an account — reviewers are prompted once for a name and email (stored only
-in their own browser), then can view, comment, and edit/delete their own
-comments. The link itself is a 128-bit random token — not guessable — and
-disabling sharing or regenerating the link immediately revokes it.
-
-## "Continue with Google" setup
-
-The code path is fully implemented (`/auth/google` redirects into
-Supabase's OAuth flow; `/auth/callback` completes it and sets a normal
-session), but it needs configuration this app's code can't do for you:
-1. In Google Cloud Console, create an OAuth 2.0 Client ID (Web
-   application) and add `https://<your-supabase-ref>.supabase.co/auth/v1/callback`
-   as an authorized redirect URI.
-2. In the Supabase Dashboard, under Authentication → Providers, enable
-   Google and paste in that client ID and secret.
-
-Until that's done, the button will redirect to an error from Supabase
-rather than Google's consent screen — expected, not a bug in this code.
-
-## Environment variables
-
-| Variable | Required | Notes |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | yes | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Supabase anon/public key — safe for this to be visible, RLS enforces access |
-| `GOOGLE_API_KEY` | yes | Drive API key, scoped to the Drive API only |
-| `PORT` | no | Defaults to 3000 |
-| `NODE_ENV` | no | Set to `production` in deployment — enables `Secure` cookies |
-
-Nothing else is needed. There is intentionally no service-role key anywhere
-in this app — every database call runs with the signed-in user's own token,
-so it's always subject to Row Level Security.
-
-See `DEPLOYMENT.md` for deployment instructions.
+<div align="center">
+  <br />
+  <sub>Built with ❤️ for creative teams. Powered by Node.js & Supabase.</sub>
+</div>
