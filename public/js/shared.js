@@ -1,8 +1,8 @@
-// Flash-free theme: apply saved/system preference before first paint.
+// Flash-free theme: apply saved preference synchronously before first paint.
 (function initTheme() {
   try {
     const saved = localStorage.getItem('theme');
-    const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const dark = saved ? saved === 'dark' : true;
     document.documentElement.classList.toggle('dark', dark);
   } catch {}
 })();
@@ -93,13 +93,37 @@ export function avatarColor(seed) {
   return AVATAR_COLORS[hash % AVATAR_COLORS.length];
 }
 
-export async function requireSession() {
-  try {
-    return await api('/api/session'); // { user, profile }
-  } catch {
-    window.location.href = '/login';
-    return null;
+let sessionPromise = null;
+
+export async function requireSession(forceRefresh = false) {
+  if (!forceRefresh) {
+    try {
+      const cached = sessionStorage.getItem('relay_session_cache');
+      if (cached) {
+        const { session, time } = JSON.parse(cached);
+        if (Date.now() - time < 600000 && session?.user) return session;
+      }
+    } catch {}
   }
+  if (!sessionPromise) {
+    sessionPromise = api('/api/session')
+      .then(session => {
+        try {
+          if (session) sessionStorage.setItem('relay_session_cache', JSON.stringify({ session, time: Date.now() }));
+          else sessionStorage.removeItem('relay_session_cache');
+        } catch {}
+        return session;
+      })
+      .catch(() => {
+        try { sessionStorage.removeItem('relay_session_cache'); } catch {}
+        window.location.href = '/login';
+        return null;
+      })
+      .finally(() => {
+        sessionPromise = null;
+      });
+  }
+  return sessionPromise;
 }
 
 /**

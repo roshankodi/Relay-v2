@@ -1487,6 +1487,13 @@ dialog::backdrop { background: rgba(10, 11, 14, 0.55); backdrop-filter: blur(2px
   background: var(--color-brand-accent);
 }
 
+#comments {
+  padding-right: 6px !important;
+  padding-left: 2px !important;
+  padding-top: 4px !important;
+  padding-bottom: 8px !important;
+}
+
 .comment-card {
   display: flex;
   gap: 14px;
@@ -1502,10 +1509,11 @@ dialog::backdrop { background: rgba(10, 11, 14, 0.55); backdrop-filter: blur(2px
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), var(--shadow-sm);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  box-sizing: border-box;
 }
 
 .comment-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: var(--color-brand-accent);
   box-shadow: var(--shadow-md), var(--glow-brand);
 }
@@ -1513,8 +1521,8 @@ dialog::backdrop { background: rgba(10, 11, 14, 0.55); backdrop-filter: blur(2px
 .comment-card.active {
   border-color: var(--color-brand-accent) !important;
   background: color-mix(in srgb, var(--color-brand-accent) 14%, var(--glass-bg)) !important;
-  box-shadow: 0 0 0 2px var(--color-brand-accent), var(--shadow-md), var(--glow-brand) !important;
-  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1.5px var(--color-brand-accent), var(--shadow-md), var(--glow-brand) !important;
+  transform: translateY(-1px);
 }
 
 .comment-avatar {

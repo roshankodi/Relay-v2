@@ -518,6 +518,9 @@
       }
     });
 
+    load();
+    loadStats();
+
     requireSession().then(session => {
       if (!session) return;
       const el = document.getElementById('sidebar-account');
@@ -532,8 +535,6 @@
       } else {
         nameEl.textContent = 'Your workspaces';
       }
-      load();
-      loadStats();
     });
   </script>
 <!-- impeccable-live-start -->

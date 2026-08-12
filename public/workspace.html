@@ -117,8 +117,10 @@
           </div>`;
       }
 
-      const imgTag = m.thumbnail_url
-        ? `<img src="${escapeHtml(m.thumbnail_url)}" alt="${escapeHtml(m.name)}" loading="lazy" class="thumb-img"
+      const imageSrc = m.thumbnail_url || (kind === 'image' ? `/api/media/${m.id}/file` : null);
+
+      const imgTag = imageSrc
+        ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(m.name)}" loading="lazy" class="thumb-img"
              onload="this.classList.add('loaded')" onerror="this.classList.add('failed');" />`
         : '';
 
@@ -217,11 +219,12 @@
       }
     });
 
+    load();
+
     requireSession().then(session => {
       if (!session) return;
       const el = document.getElementById('sidebar-account');
       if (el) el.textContent = initials(session.profile?.display_name || session.user?.email || '?');
-      load();
     });
   </script>
 <!-- impeccable-live-start -->
