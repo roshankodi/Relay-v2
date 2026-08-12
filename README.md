@@ -1,17 +1,17 @@
 <div align="center">
 
   <br />
-  <img src="public/favicon.svg" alt="Relay Logo" width="80" height="80" />
+  <img src="public/favicon.svg" alt="Relay Logo" width="84" height="84" />
   
   # Relay — Next-Gen Frame-Accurate Media Reviews
 
   <p align="center">
-    <strong>Review video, audio, and image assets straight from your Google Drive — zero downloads required.</strong>
+    <strong>Review video, audio, and image assets directly from Google Drive — zero downloads required.</strong>
   </p>
 
   <p align="center">
     <a href="https://relay-v2.onrender.com" target="_blank">
-      <img src="https://img.shields.io/badge/🌐_Live_Demo-https%3A%2F%2Frelay--v2.onrender.com-2E7D4F?style=for-the-badge&logo=render&logoColor=white" alt="Live Demo" />
+      <img src="https://img.shields.io/badge/🌐_Live_Production-https%3A%2F%2Frelay--v2.onrender.com-2E7D4F?style=for-the-badge&logo=render&logoColor=white" alt="Live Demo" />
     </a>
   </p>
 
@@ -30,38 +30,46 @@
 
 ## ⚡ Overview
 
-**Relay** is a high-fidelity, zero-dependency media review platform built for creative teams, video editors, and agency clients. Reviewers drop timestamped comments, drag timeline range selections, and leave visual annotations directly on media files stored in your public Google Drive.
+**Relay** is a high-fidelity, zero-dependency media review platform engineered for creative teams, video editors, and agency clients. Reviewers leave timestamped comments, drag timeline range selections (`0:15–0:20`), and collaborate seamlessly on assets hosted directly in your public Google Drive.
 
-> 🚀 **Live Production Link**: **[https://relay-v2.onrender.com](https://relay-v2.onrender.com)**
+> 🌐 **Live Production Link**: **[https://relay-v2.onrender.com](https://relay-v2.onrender.com)**
 
 ---
 
-## ✨ Key Features
+## ✨ Core Highlights
 
-- ⏱ **Frame-Accurate Feedback**: Comment at exact video timestamps or drag to select range markers (`0:15–0:20`).
-- 📂 **Stays in Google Drive**: Relay reads directly from public Drive folders. No file re-uploading, duplicating, or storage costs.
-- 🔗 **Share Without Friction**: Share a 128-bit secure review link. Reviewers enter their name once and start commenting — no signup required.
-- 🎵 **Multi-Format Previews**: Native video stage, audio waveform player, and image review with fallback canvases.
-- ⚡ **Zero-Build Architecture**: Pure Node.js HTTP server and vanilla HTML/CSS/JS. Zero heavy bundlers, zero npm dependency vulnerabilities.
-- 📱 **Mobile-First Responsive**: 100% fluid mobile, tablet, and desktop interface with touch-friendly 44px tap targets.
+- ⏱ **Frame-Accurate Feedback**: Comment at exact timestamps or drag timeline handles for range feedback.
+- 📂 **Stays in Google Drive**: Reads directly from public Drive folders. No file re-uploading or duplicate storage fees.
+- 🔗 **Share Without Friction**: Share secure 128-bit review links. Reviewers add their name once and start commenting — no account required.
+- 🎵 **Multi-Format Fallback Previews**: Type-specific preview canvases for video, audio, and image assets.
+- ⚡ **Zero-Build Architecture**: Pure Node.js HTTP server and vanilla HTML/CSS/JS. Zero heavy bundler configurations or npm security vulnerabilities.
+- 📱 **Mobile-First Responsive**: 100% fluid interface tailored for small phones, tablets, laptops, and large desktop screens.
 - 🌓 **Flash-Free Theme Engine**: Instant, zero-flicker dark & light mode switching.
 
 ---
 
-## 🛠 Project Architecture
+## 🛠 Tech Stack & Architecture
+
+| Layer | Technology |
+|---|---|
+| **Runtime** | Pure Node.js (v18+) with native modules (`node:http`, `node:crypto`, `fetch`) |
+| **Frontend** | Vanilla HTML5 / CSS3 (Minty Glass Design System) / ES Modules |
+| **Authentication** | Supabase Auth (OAuth 2.0 Google Integration & Passwordless Sessions) |
+| **Database** | PostgreSQL + Row Level Security (RLS) via PostgREST |
+| **Storage Engine** | Google Drive v3 REST API |
 
 ```
 relay/
 ├── server.js                # High-performance zero-dependency HTTP server
 ├── lib/
 │   ├── supabase.js          # Direct Supabase Auth & PostgREST fetch client
-│   ├── drive.js             # Google Drive REST API integration
+│   ├── drive.js             # Google Drive v3 REST API integration
 │   ├── session.js           # Secure cookie session management
-│   ├── validate.js          # Strict server-side input validation
-│   ├── cookies.js           # Cookie parsing utility
-│   └── ratelimit.js         # In-memory rate limiting engine
+│   ├── validate.js          # Server-side input validation engine
+│   ├── cookies.js           # Cookie parsing & serialization
+│   └── ratelimit.js         # Per-instance rate limiting
 ├── public/                  # Flash-free front-end application
-│   ├── index.html           # Landing page & interactive hero preview
+│   ├── index.html           # Landing page & interactive hero demo
 │   ├── app.html             # Workspace directory & stats dashboard
 │   ├── workspace.html       # Media grid & Google Drive sync engine
 │   ├── media.html           # Professional video/audio player & review stage
@@ -75,7 +83,7 @@ relay/
 
 ## 🚀 Quick Start
 
-### 1. Clone & Setup Environment
+### 1. Clone & Setup
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/relay.git
@@ -83,9 +91,9 @@ cd relay
 cp .env.example .env
 ```
 
-### 2. Configure Environment Variables
+### 2. Environment Configuration
 
-Edit `.env` with your credentials:
+Configure your `.env` variables:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-id.supabase.co
@@ -95,19 +103,19 @@ PORT=3000
 NODE_ENV=development
 ```
 
-### 3. Run Locally
+### 3. Launch Locally
 
 ```bash
 npm run dev
 ```
 
-Visit **`http://localhost:3000`** in your browser.
+Open **`http://localhost:3000`** in your browser.
 
 ---
 
 ## 🧪 Unit Tests
 
-Run the dependency-free Node.js unit test suite:
+Run the built-in Node.js test suite:
 
 ```bash
 npm test
@@ -115,15 +123,21 @@ npm test
 
 ---
 
-## 🔒 Security & Capability Model
+## 🔒 Security Model
 
-- **Row Level Security (RLS)**: Database access is strictly governed by Supabase RLS policies.
-- **Guest Capabilities**: Anonymous guest comments use 128-bit capability tokens stored locally in the reviewer's browser, preventing unauthorized comment tampering.
-- **Zero Service-Role Leaks**: Database queries run with the user's own session token.
+- **Row Level Security (RLS)**: Database queries are subject to PostgreSQL RLS policies matching the user's session token.
+- **Guest Capabilities**: Anonymous guest reviewers receive a 128-bit token stored in `localStorage` to authorize editing/deleting their own comments.
+- **Zero Service-Role Key**: No administrative service-role keys are exposed or used by the server.
 
 ---
 
+<br />
+
 <div align="center">
-  <br />
-  <sub>Built with ❤️ for creative teams. Powered by Node.js & Supabase.</sub>
+  <p align="center">
+    Crafted with ❤️ by <strong>Roshan</strong> @ <strong>Deep Sauce Labs</strong>
+  </p>
+  <p align="center">
+    <sub>© 2026 Deep Sauce Labs. All rights reserved.</sub>
+  </p>
 </div>
