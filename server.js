@@ -704,8 +704,8 @@ async function handlePublicDeleteComment(req, res, token, commentId, guestToken)
 // Router
 // ---------------------------------------------------------------------
 
-const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
+export default async function handler(req, res) {
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const { pathname } = url;
   const method = req.method;
 
@@ -827,8 +827,12 @@ const server = http.createServer(async (req, res) => {
     console.error('Unhandled error', e);
     if (!res.headersSent) json(res, 500, { error: 'Something went wrong' });
   }
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`Relay listening on http://localhost:${PORT}`);
-});
+const server = http.createServer(handler);
+
+if (process.env.VERCEL !== '1' && process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
+    console.log(`Relay listening on http://localhost:${PORT}`);
+  });
+}
