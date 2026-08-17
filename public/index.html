@@ -230,7 +230,7 @@
   </footer>
 
   <script type="module">
-    import { icon, toggleTheme, api, getCachedSession } from '/js/shared.js';
+    import { icon, toggleTheme } from '/js/shared.js';
 
     function updateThemeIcon() {
       document.getElementById('theme-btn').innerHTML = icon(document.documentElement.classList.contains('dark') ? 'sun' : 'moon', { size: 16 });
@@ -240,35 +240,6 @@
       toggleTheme();
       updateThemeIcon();
     });
-
-    function applyLoggedInState(session) {
-      if (!session?.user) return;
-      const signinBtn = document.getElementById('signin-btn');
-      if (signinBtn) {
-        signinBtn.href = '/app';
-        signinBtn.textContent = 'Go to Dashboard →';
-      }
-      const ctaBtn = document.getElementById('cta-btn');
-      if (ctaBtn) {
-        ctaBtn.href = '/app';
-        ctaBtn.innerHTML = icon('folder', { size: 15 }) + ' Open Dashboard';
-      }
-    }
-
-    // Instant 0ms cached check
-    const cachedSession = getCachedSession();
-    if (cachedSession) applyLoggedInState(cachedSession);
-
-    // Non-blocking background verification
-    api('/api/session')
-      .then(session => {
-        try {
-          if (session?.user) sessionStorage.setItem('relay_session_cache', JSON.stringify({ session, time: Date.now() }));
-          else sessionStorage.removeItem('relay_session_cache');
-        } catch {}
-        applyLoggedInState(session);
-      })
-      .catch(() => {});
 
     document.getElementById('bubble-chat').innerHTML = icon('chat', { size: 18 });
     document.getElementById('bubble-link').innerHTML = icon('link', { size: 18 });
