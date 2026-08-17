@@ -156,8 +156,8 @@
         <textarea id="w-desc" rows="2" maxlength="500"></textarea>
       </div>
       <div class="field">
-        <label for="w-url">Public Google Drive folder URL</label>
-        <input id="w-url" required placeholder="https://drive.google.com/drive/folders/..." />
+        <label for="w-url">Public Google Drive folder or file URL</label>
+        <input id="w-url" required placeholder="https://drive.google.com/file/d/... or /folders/..." />
       </div>
       <p class="error-text" id="new-error" role="alert" style="color:var(--color-danger); font-size:13px; margin:8px 0; font-weight:600;"></p>
       <div style="display:flex; justify-content:flex-end; gap:8px;">
@@ -273,14 +273,19 @@
 
       listEl.innerHTML = sorted
         .map(
-          w => {
             const isPinned = pinnedSet.has(w.id);
+            const kind = w.preview_kind || 'video';
+            const imgTag = w.preview_thumbnail || (kind === 'image' && w.preview_media_id ? `/api/media/${w.preview_media_id}/file` : null);
+            const previewBox = (w.preview_thumbnail || w.preview_kind)
+              ? `<div class="workspace-icon-box workspace-thumb-box">
+                  <div class="workspace-thumb-fallback">${icon(kind === 'audio' ? 'music' : kind === 'image' ? 'image' : 'video', { size: 22 })}</div>
+                  ${imgTag ? `<img src="${escapeHtml(imgTag)}" alt="" class="workspace-thumb-img" onload="this.classList.add('loaded')" onerror="this.classList.add('failed')" />` : ''}
+                 </div>`
+              : `<div class="workspace-icon-box">${icon('folder', { size: 28 })}</div>`;
             return `<div class="card card-glass workspace-card ${isPinned ? 'is-pinned' : ''}" data-id="${w.id}" data-owner="${w.isOwner}">
             <div class="workspace-card-header">
               <div class="workspace-card-main">
-                <div class="workspace-icon-box">
-                  ${icon('folder', { size: 28 })}
-                </div>
+                ${previewBox}
                 <div class="workspace-info">
                   <div style="display:flex; align-items:center; gap:8px;">
                     <a class="workspace-title-link" href="/app/workspaces/${w.id}">${escapeHtml(w.name)}</a>
@@ -491,8 +496,8 @@
       const urlVal = document.getElementById('w-url').value.trim();
       errorEl.textContent = '';
 
-      if (!urlVal.includes('drive.google.com') && !urlVal.includes('folders/')) {
-        errorEl.textContent = 'Please enter a valid Google Drive folder link (e.g. https://drive.google.com/drive/folders/...)';
+      if (!urlVal.includes('drive.google.com') || (!urlVal.includes('/folders/') && !urlVal.includes('/file/d/') && !urlVal.includes('id='))) {
+        errorEl.textContent = 'Please enter a valid Google Drive folder or file link (e.g. https://drive.google.com/file/d/... or /folders/...)';
         return;
       }
 

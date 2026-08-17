@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateWorkspaceInput, validateCommentInput, isUuid, ValidationError } from '../lib/validate.js';
-import { folderIdFromUrl } from '../lib/drive.js';
+import { folderIdFromUrl, driveTargetFromUrl } from '../lib/drive.js';
 
 test('validateWorkspaceInput accepts a valid workspace', () => {
   const result = validateWorkspaceInput({
@@ -74,12 +74,21 @@ test('validateCommentInput rejects a malformed parentId', () => {
   assert.throws(() => validateCommentInput({ body: 'x', parentId: 'not-a-uuid' }), ValidationError);
 });
 
-test('folderIdFromUrl extracts the folder id', () => {
+test('folderIdFromUrl and driveTargetFromUrl extract target ids and types', () => {
   assert.equal(folderIdFromUrl('https://drive.google.com/drive/folders/1AbC-def_23'), '1AbC-def_23');
   assert.equal(folderIdFromUrl('https://drive.google.com/open?id=1AbC-def_23'), '1AbC-def_23');
+  assert.equal(folderIdFromUrl('https://drive.google.com/file/d/1iBa0gqY7ADJ6PMvSCbfQcif1krM6tXta/view'), '1iBa0gqY7ADJ6PMvSCbfQcif1krM6tXta');
+
+  const fileTarget = driveTargetFromUrl('https://drive.google.com/file/d/1iBa0gqY7ADJ6PMvSCbfQcif1krM6tXta/view');
+  assert.equal(fileTarget.type, 'file');
+  assert.equal(fileTarget.id, '1iBa0gqY7ADJ6PMvSCbfQcif1krM6tXta');
+
+  const folderTarget = driveTargetFromUrl('https://drive.google.com/drive/folders/1AbC-def_23');
+  assert.equal(folderTarget.type, 'folder');
+  assert.equal(folderTarget.id, '1AbC-def_23');
 });
 
-test('folderIdFromUrl rejects a URL with no folder id', () => {
+test('folderIdFromUrl rejects a URL with no valid id', () => {
   assert.throws(() => folderIdFromUrl('https://drive.google.com/drive/my-drive'));
 });
 

@@ -8,7 +8,7 @@ import { Readable } from 'node:stream';
 import { parseCookies } from './lib/cookies.js';
 import { setSessionCookies, clearSessionCookies, getSession } from './lib/session.js';
 import { signUp, signInWithPassword, signOut, pg, pgPublic, googleAuthorizeUrl, getUser, SupabaseApiError } from './lib/supabase.js';
-import { folderIdFromUrl, scanPublicFolder, fetchDriveFile } from './lib/drive.js';
+import { folderIdFromUrl, scanPublicFolder, scanPublicDriveTarget, driveTargetFromUrl, fetchDriveFile } from './lib/drive.js';
 import { validateWorkspaceInput, validateCommentInput, validateGuestIdentity, isUuid, ValidationError } from './lib/validate.js';
 import { rateLimit, clientKey } from './lib/ratelimit.js';
 import { sanitizeComment, sanitizeComments } from './lib/comments.js';
@@ -237,7 +237,29 @@ async function handleListWorkspaces(req, res, session) {
     token: session.token,
     query: { select: WORKSPACE_COLUMNS, order: 'created_at.desc' },
   });
-  json(res, 200, rows.map(w => ({ ...w, isOwner: w.owner_id === session.user.id })));
+  const workspaceIds = rows.map(w => w.id);
+  const mediaMap = new Map();
+  if (workspaceIds.length) {
+    try {
+      const mediaRows = await pg('media', {
+        token: session.token,
+        query: { select: 'workspace_id,thumbnail_url,media_kind,id', workspace_id: `in.(${workspaceIds.join(',')})`, is_deleted: 'eq.false', order: 'created_at.asc' },
+      });
+      for (const m of mediaRows) {
+        if (!mediaMap.has(m.workspace_id)) mediaMap.set(m.workspace_id, m);
+      }
+    } catch {}
+  }
+  json(res, 200, rows.map(w => {
+    const pm = mediaMap.get(w.id);
+    return {
+      ...w,
+      isOwner: w.owner_id === session.user.id,
+      preview_thumbnail: pm?.thumbnail_url ?? null,
+      preview_kind: pm?.media_kind ?? null,
+      preview_media_id: pm?.id ?? null,
+    };
+  }));
 }
 
 /**
@@ -271,7 +293,7 @@ async function handleCreateWorkspace(req, res, session) {
     return json(res, 429, { error: 'Too many requests, slow down.' });
   }
   const input = validateWorkspaceInput(await readBody(req));
-  const folderId = folderIdFromUrl(input.driveUrl);
+  const target = driveTargetFromUrl(input.driveUrl);
   const [workspace] = await pg('workspaces', {
     method: 'POST',
     token: session.token,
@@ -281,7 +303,7 @@ async function handleCreateWorkspace(req, res, session) {
       owner_id: session.user.id,
       name: input.name,
       description: input.description || null,
-      drive_folder_id: folderId,
+      drive_folder_id: target.id,
       drive_url: input.driveUrl,
     },
   });
@@ -290,7 +312,7 @@ async function handleCreateWorkspace(req, res, session) {
     token: session.token,
     body: { workspace_id: workspace.id, user_id: session.user.id, role: 'owner' },
   });
-  const files = await scanPublicFolder(folderId);
+  const files = await scanPublicDriveTarget(input.driveUrl);
   if (files.length) {
     await pg('media', { method: 'POST', token: session.token, body: files.map(f => mediaRow(workspace.id, f)) });
   }
@@ -329,7 +351,7 @@ async function handleSyncWorkspace(req, res, session, id) {
   }
   const [workspace] = await pg('workspaces', { token: session.token, query: { select: WORKSPACE_COLUMNS, id: `eq.${id}` } });
   if (!workspace || workspace.owner_id !== session.user.id) return json(res, 403, { error: 'Forbidden' });
-  const files = await scanPublicFolder(workspace.drive_folder_id);
+  const files = await scanPublicDriveTarget(workspace.drive_url || workspace.drive_folder_id);
   const ids = files.map(f => f.id);
   const notInList = ids.length ? `(${ids.map(x => `"${x}"`).join(',')})` : '("")';
   await pg('media', {

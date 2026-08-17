@@ -93,17 +93,23 @@ export function avatarColor(seed) {
   return AVATAR_COLORS[hash % AVATAR_COLORS.length];
 }
 
+export function getCachedSession() {
+  try {
+    const cached = sessionStorage.getItem('relay_session_cache');
+    if (cached) {
+      const { session, time } = JSON.parse(cached);
+      if (Date.now() - time < 600000 && session?.user) return session;
+    }
+  } catch {}
+  return null;
+}
+
 let sessionPromise = null;
 
 export async function requireSession(forceRefresh = false) {
   if (!forceRefresh) {
-    try {
-      const cached = sessionStorage.getItem('relay_session_cache');
-      if (cached) {
-        const { session, time } = JSON.parse(cached);
-        if (Date.now() - time < 600000 && session?.user) return session;
-      }
-    } catch {}
+    const cached = getCachedSession();
+    if (cached) return cached;
   }
   if (!sessionPromise) {
     sessionPromise = api('/api/session')
