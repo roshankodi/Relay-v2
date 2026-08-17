@@ -170,9 +170,13 @@
         const { workspace, media } = await api(`/api/workspaces/${id}`);
         render(workspace, media);
       } catch (e) {
+        if (e.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-          <p>Couldn't load this workspace.</p>
-          <button class="btn btn-ghost" id="retry">Try again</button>
+          <p style="color:var(--color-danger); font-weight:600;">${escapeHtml(e.message || "Couldn't load this workspace.")}</p>
+          <button class="btn btn-ghost" id="retry" style="margin-top:12px;">Try again</button>
         </div>`;
         document.getElementById('retry')?.addEventListener('click', load);
       }
