@@ -111,6 +111,6 @@ relay/
 
 ## Author & Credits
 
-Designed & Developed by **Roshan** at **Deep Sauce Labs**. ❤️
+Designed & Developed by **Roshan** at **Deep Sauce Labs**. 
 
 © 2026 Deep Sauce Labs. All rights reserved. 

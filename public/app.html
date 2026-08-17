@@ -273,19 +273,14 @@
 
       listEl.innerHTML = sorted
         .map(
+          w => {
             const isPinned = pinnedSet.has(w.id);
-            const kind = w.preview_kind || 'video';
-            const imgTag = w.preview_thumbnail || (kind === 'image' && w.preview_media_id ? `/api/media/${w.preview_media_id}/file` : null);
-            const previewBox = (w.preview_thumbnail || w.preview_kind)
-              ? `<div class="workspace-icon-box workspace-thumb-box">
-                  <div class="workspace-thumb-fallback">${icon(kind === 'audio' ? 'music' : kind === 'image' ? 'image' : 'video', { size: 22 })}</div>
-                  ${imgTag ? `<img src="${escapeHtml(imgTag)}" alt="" class="workspace-thumb-img" onload="this.classList.add('loaded')" onerror="this.classList.add('failed')" />` : ''}
-                 </div>`
-              : `<div class="workspace-icon-box">${icon('folder', { size: 28 })}</div>`;
             return `<div class="card card-glass workspace-card ${isPinned ? 'is-pinned' : ''}" data-id="${w.id}" data-owner="${w.isOwner}">
             <div class="workspace-card-header">
               <div class="workspace-card-main">
-                ${previewBox}
+                <div class="workspace-icon-box">
+                  ${icon('folder', { size: 28 })}
+                </div>
                 <div class="workspace-info">
                   <div style="display:flex; align-items:center; gap:8px;">
                     <a class="workspace-title-link" href="/app/workspaces/${w.id}">${escapeHtml(w.name)}</a>
@@ -484,11 +479,7 @@
         allWorkspaces = await api('/api/workspaces');
         applySearchAndRender();
       } catch (e) {
-        if (e.status === 401) {
-          window.location.href = '/login';
-          return;
-        }
-        listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">${escapeHtml(e.message || "Couldn't load workspaces.")} <button class="btn btn-ghost" id="retry">Retry</button></div>`;
+        listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Couldn't load workspaces. <button class="btn btn-ghost" id="retry">Retry</button></div>`;
         document.getElementById('retry')?.addEventListener('click', load);
       }
     }
@@ -546,5 +537,8 @@
       }
     });
   </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=0b03114c-cac8-48dd-9879-2111cd55959d"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

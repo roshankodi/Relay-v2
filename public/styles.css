@@ -964,41 +964,6 @@ label { display: block; font-size: var(--text-sm); font-weight: 600; margin-bott
   display: none !important;
 }
 
-/* Workspace Card Thumbnail Box */
-.workspace-thumb-box {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-alt);
-}
-
-.workspace-thumb-fallback {
-  display: grid;
-  place-items: center;
-  color: var(--color-brand-accent);
-}
-
-.workspace-thumb-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 2;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.workspace-thumb-img.loaded {
-  opacity: 1;
-}
-
-.workspace-thumb-img.failed {
-  display: none !important;
-}
-
 /* Media Preview Canvas System — Always Visual, Never Blank */
 .thumb-fallback-canvas {
   position: absolute;

@@ -170,13 +170,9 @@
         const { workspace, media } = await api(`/api/workspaces/${id}`);
         render(workspace, media);
       } catch (e) {
-        if (e.status === 401) {
-          window.location.href = '/login';
-          return;
-        }
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-          <p style="color:var(--color-danger); font-weight:600;">${escapeHtml(e.message || "Couldn't load this workspace.")}</p>
-          <button class="btn btn-ghost" id="retry" style="margin-top:12px;">Try again</button>
+          <p>Couldn't load this workspace.</p>
+          <button class="btn btn-ghost" id="retry">Try again</button>
         </div>`;
         document.getElementById('retry')?.addEventListener('click', load);
       }
@@ -231,5 +227,8 @@
       if (el) el.textContent = initials(session.profile?.display_name || session.user?.email || '?');
     });
   </script>
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=0b03114c-cac8-48dd-9879-2111cd55959d"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

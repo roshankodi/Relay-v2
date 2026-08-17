@@ -237,29 +237,7 @@ async function handleListWorkspaces(req, res, session) {
     token: session.token,
     query: { select: WORKSPACE_COLUMNS, order: 'created_at.desc' },
   });
-  const workspaceIds = rows.map(w => w.id);
-  const mediaMap = new Map();
-  if (workspaceIds.length) {
-    try {
-      const mediaRows = await pg('media', {
-        token: session.token,
-        query: { select: 'workspace_id,thumbnail_url,media_kind,id', is_deleted: 'eq.false', order: 'created_at.asc' },
-      });
-      for (const m of mediaRows) {
-        if (m && m.workspace_id && !mediaMap.has(m.workspace_id)) mediaMap.set(m.workspace_id, m);
-      }
-    } catch {}
-  }
-  json(res, 200, rows.map(w => {
-    const pm = mediaMap.get(w.id);
-    return {
-      ...w,
-      isOwner: w.owner_id === session.user.id,
-      preview_thumbnail: pm?.thumbnail_url ?? null,
-      preview_kind: pm?.media_kind ?? null,
-      preview_media_id: pm?.id ?? null,
-    };
-  }));
+  json(res, 200, rows.map(w => ({ ...w, isOwner: w.owner_id === session.user.id })));
 }
 
 /**
