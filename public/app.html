@@ -484,7 +484,11 @@
         allWorkspaces = await api('/api/workspaces');
         applySearchAndRender();
       } catch (e) {
-        listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Couldn't load workspaces. <button class="btn btn-ghost" id="retry">Retry</button></div>`;
+        if (e.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+        listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">${escapeHtml(e.message || "Couldn't load workspaces.")} <button class="btn btn-ghost" id="retry">Retry</button></div>`;
         document.getElementById('retry')?.addEventListener('click', load);
       }
     }
@@ -523,9 +527,6 @@
       }
     });
 
-    load();
-    loadStats();
-
     requireSession().then(session => {
       if (!session) return;
       const el = document.getElementById('sidebar-account');
@@ -540,6 +541,8 @@
       } else {
         nameEl.textContent = 'Your workspaces';
       }
+      load();
+      loadStats();
     });
   </script>
 </body>

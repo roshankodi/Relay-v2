@@ -243,10 +243,10 @@ async function handleListWorkspaces(req, res, session) {
     try {
       const mediaRows = await pg('media', {
         token: session.token,
-        query: { select: 'workspace_id,thumbnail_url,media_kind,id', workspace_id: `in.(${workspaceIds.join(',')})`, is_deleted: 'eq.false', order: 'created_at.asc' },
+        query: { select: 'workspace_id,thumbnail_url,media_kind,id', is_deleted: 'eq.false', order: 'created_at.asc' },
       });
       for (const m of mediaRows) {
-        if (!mediaMap.has(m.workspace_id)) mediaMap.set(m.workspace_id, m);
+        if (m && m.workspace_id && !mediaMap.has(m.workspace_id)) mediaMap.set(m.workspace_id, m);
       }
     } catch {}
   }
