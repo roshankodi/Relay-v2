@@ -98,6 +98,13 @@ let sessionPromise = null;
 export async function requireSession() {
   if (!sessionPromise) {
     sessionPromise = api('/api/session')
+      .then(session => {
+        if (!session?.user) {
+          window.location.href = '/login';
+          return null;
+        }
+        return session;
+      })
       .catch(() => {
         window.location.href = '/login';
         return null;
