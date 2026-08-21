@@ -104,6 +104,13 @@
         deleteComment: id => api(`/api/comments/${id}`, { method: 'DELETE' }),
       },
       onMediaLoaded: media => {
+        if (media.workspaceIsSingle) {
+          const backLink = document.getElementById('back-link');
+          if (backLink) {
+            backLink.href = '/app';
+            backLink.textContent = '← Back to workspaces';
+          }
+        }
         if (!media.workspaceIsOwner) return;
         const shareBtn = document.getElementById('share-media-btn');
         shareBtn.hidden = false;

@@ -20,46 +20,48 @@
 <body>
   <div class="app-shell">
     <div class="shell-content">
-      <header class="topbar" style="padding: 18px 36px;">
-        <a class="brand" href="/app" style="font-size:22px; font-weight:900; letter-spacing:-0.5px; color:var(--color-text-primary); text-decoration:none;">Relay</a>
+      <header class="topbar" style="padding: 20px 40px;">
+        <a class="brand" href="/app" style="font-size:24px; font-weight:900; letter-spacing:-0.5px; color:var(--color-text-primary); text-decoration:none;">Relay</a>
         <div style="display:flex; gap:12px; align-items:center;">
-          <button class="btn btn-ghost btn-icon" id="theme-btn" aria-label="Toggle theme" style="width:36px; height:36px; border-radius:var(--radius-md); border:1px solid var(--glass-border); display:grid; place-items:center; cursor:pointer; background:var(--glass-bg); color:var(--color-text-primary);"></button>
-          <div class="sidebar-account" id="sidebar-account" title="Account" style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, var(--color-brand-accent), #1B5E3A); color:#FFF; display:grid; place-items:center; font-size:12px; font-weight:800; box-shadow:0 2px 8px rgba(46,125,79,0.3);">·</div>
+          <button class="btn btn-ghost btn-icon" id="theme-btn" aria-label="Toggle theme" style="width:38px; height:38px; border-radius:var(--radius-md); border:1px solid var(--glass-border); display:grid; place-items:center; cursor:pointer; background:var(--glass-bg); color:var(--color-text-primary);"></button>
+          <div class="sidebar-account" id="sidebar-account" title="Account" style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, var(--color-brand-accent), #1B5E3A); color:#FFF; display:grid; place-items:center; font-size:13px; font-weight:800; box-shadow:0 2px 8px rgba(46,125,79,0.3);">·</div>
           <button class="btn btn-ghost" id="signout-btn" style="font-size:14px; font-weight:600; color:var(--color-text-secondary);">Sign out</button>
         </div>
       </header>
 
-      <main class="container" style="max-width: 1060px; width: 100%; padding: 36px 32px 48px; margin: 0 auto;">
+      <main class="container" style="max-width: 1145px; width: 100%; padding: 40px 34px 54px; margin: 0 auto;">
         <!-- Spacious Top Greeting Header -->
-        <div class="hero-banner" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--glass-border);">
+        <div class="hero-banner" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-bottom: 34px; padding-bottom: 26px; border-bottom: 1px solid var(--glass-border);">
           <div>
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
               <span class="pulse-dot"></span>
-              <p class="text-muted" id="greeting" style="font-size:13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--color-brand-accent); margin:0;">Welcome back</p>
+              <p class="text-muted" id="greeting" style="font-size:14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--color-brand-accent); margin:0;">Welcome back</p>
             </div>
-            <h1 class="hero-title-xl" id="greeting-name" style="font-size:48px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.1; margin:0;">Your Workspaces</h1>
+            <h1 class="hero-title-xl" id="greeting-name" style="font-size:52px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.1; margin:0;">Your Workspaces</h1>
           </div>
           <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-            <div style="display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:var(--radius-pill); background:var(--glass-bg); border:1px solid var(--glass-border); font-size:13px; font-weight:600; color:var(--color-text-secondary);">
+            <div style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:var(--radius-pill); background:var(--glass-bg); border:1px solid var(--glass-border); font-size:14px; font-weight:600; color:var(--color-text-secondary);">
               <span style="width:8px; height:8px; border-radius:50%; background:var(--color-success); display:inline-block;"></span> Drive Sync Active
             </div>
-            <button class="btn btn-primary" id="new-btn" style="font-family: var(--font-family); padding: 10px 22px; font-size: 14px; font-weight: 650; letter-spacing: -0.2px; border-radius: var(--radius-pill); background: var(--color-brand-accent); color: #FFFFFF; border: 1px solid color-mix(in srgb, var(--color-brand-accent) 80%, white); box-shadow: 0 4px 16px color-mix(in srgb, var(--color-brand-accent) 28%, transparent); display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer;"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg> Create New Workspace</button>
+            <button class="btn btn-primary" id="new-btn" style="font-family: var(--font-family); padding: 11px 24px; font-size: 15px; font-weight: 650; letter-spacing: -0.2px; border-radius: var(--radius-pill); background: var(--color-brand-accent); color: #FFFFFF; border: 1px solid color-mix(in srgb, var(--color-brand-accent) 80%, white); box-shadow: 0 4px 16px color-mix(in srgb, var(--color-brand-accent) 28%, transparent); display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer;"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg> Create New Workspace</button>
           </div>
         </div>
 
 
 
         <!-- WORKSPACE DIRECTORY HERO HEADER WITH FILTER TABS -->
-        <div class="directory-hero-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-bottom:28px;">
+        <div class="directory-hero-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; margin-bottom:30px;">
           <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
-            <h2 style="font-size: 30px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.2; display:flex; align-items:center; gap:10px; margin:0;">Workspace Directory <span class="sparkle-accent" id="section-sparkle"></span></h2>
-            <div style="display:flex; align-items:center; gap:6px; padding:4px; border-radius:var(--radius-pill); background:var(--glass-bg); border:1px solid var(--glass-border);" id="filter-tabs">
-              <button type="button" id="tab-all" style="padding:5px 14px; border-radius:var(--radius-pill); background:var(--color-brand-accent); color:#fff; font-size:12px; font-weight:700; cursor:pointer; border:none; transition:all 0.15s ease;">All (<span id="count-all">0</span>)</button>
-              <button type="button" id="tab-public" style="padding:5px 14px; border-radius:var(--radius-pill); background:transparent; color:var(--color-text-secondary); font-size:12px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s ease;">Public Links (<span id="count-public">0</span>)</button>
+            <h2 style="font-size: 32px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.2; display:flex; align-items:center; gap:10px; margin:0;">Workspace Directory <span class="sparkle-accent" id="section-sparkle"></span></h2>
+            <div style="display:flex; align-items:center; gap:6px; padding:5px; border-radius:var(--radius-pill); background:var(--glass-bg); border:1px solid var(--glass-border);" id="filter-tabs">
+              <button type="button" id="tab-all" style="padding:6px 16px; border-radius:var(--radius-pill); background:var(--color-brand-accent); color:#fff; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all 0.15s ease;">All (<span id="count-all">0</span>)</button>
+              <button type="button" id="tab-folders" style="padding:6px 16px; border-radius:var(--radius-pill); background:transparent; color:var(--color-text-secondary); font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s ease;">Folders (<span id="count-folders">0</span>)</button>
+              <button type="button" id="tab-files" style="padding:6px 16px; border-radius:var(--radius-pill); background:transparent; color:var(--color-text-secondary); font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s ease;">Single Media (<span id="count-files">0</span>)</button>
+              <button type="button" id="tab-public" style="padding:6px 16px; border-radius:var(--radius-pill); background:transparent; color:var(--color-text-secondary); font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s ease;">Public (<span id="count-public">0</span>)</button>
             </div>
           </div>
-          <div style="position:relative; width:320px;">
-            <input type="text" id="search-input" placeholder="Search workspaces..." style="width:100%; padding:11px 76px 11px 40px; border-radius:var(--radius-pill); border:1px solid var(--glass-border); background:var(--glass-bg); color:var(--color-text-primary); font-size:14px; font-weight:500; outline:none; transition:all 0.2s ease; box-shadow:var(--shadow-xs);">
+          <div style="position:relative; width:346px;">
+            <input type="text" id="search-input" placeholder="Search workspaces..." style="width:100%; padding:12px 80px 12px 44px; border-radius:var(--radius-pill); border:1px solid var(--glass-border); background:var(--glass-bg); color:var(--color-text-primary); font-size:15px; font-weight:500; outline:none; transition:all 0.2s ease; box-shadow:var(--shadow-xs);">
             <span style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--color-text-secondary); pointer-events:none; font-size:14px;">🔍</span>
             <button type="button" id="search-clear-btn" aria-label="Clear search" hidden style="position:absolute; right:48px; top:50%; transform:translateY(-50%); background:var(--color-surface-alt); border:1px solid var(--glass-border); border-radius:50%; width:20px; height:20px; display:grid; place-items:center; color:var(--color-text-secondary); cursor:pointer; font-size:11px; font-weight:800; padding:0;">✕</button>
             <kbd style="position:absolute; right:14px; top:50%; transform:translateY(-50%); font-family:inherit; font-size:11px; font-weight:700; color:var(--color-text-secondary); background:var(--color-surface-alt); border:1px solid var(--glass-border); border-radius:4px; padding:2px 6px; pointer-events:none;">⌘K</kbd>
@@ -275,15 +277,17 @@
         .map(
           w => {
             const isPinned = pinnedSet.has(w.id);
-            return `<div class="card card-glass workspace-card ${isPinned ? 'is-pinned' : ''}" data-id="${w.id}" data-owner="${w.isOwner}">
+            const isSingle = Boolean(w.singleMediaId || (w.drive_url && (w.drive_url.includes('/file/d/') || w.drive_url.includes('/uc?') || (w.drive_url.includes('id=') && !w.drive_url.includes('/folders/')))));
+            const targetUrl = w.singleMediaId ? `/app/workspaces/${w.id}/media/${w.singleMediaId}` : `/app/workspaces/${w.id}`;
+            return `<div class="card card-glass workspace-card ${isPinned ? 'is-pinned' : ''}" data-id="${w.id}" data-target-url="${targetUrl}" data-owner="${w.isOwner}">
             <div class="workspace-card-header">
               <div class="workspace-card-main">
-                <div class="workspace-icon-box">
-                  ${icon('folder', { size: 28 })}
+                <div class="workspace-icon-box ${isSingle ? 'is-file' : ''}">
+                  ${isSingle ? icon('file', { size: 24 }) : icon('folder', { size: 24 })}
                 </div>
                 <div class="workspace-info">
                   <div style="display:flex; align-items:center; gap:8px;">
-                    <a class="workspace-title-link" href="/app/workspaces/${w.id}">${escapeHtml(w.name)}</a>
+                    <a class="workspace-title-link" href="${targetUrl}">${escapeHtml(w.name)}</a>
                     ${isPinned ? `<span style="font-size:11px; padding:2px 8px; border-radius:var(--radius-pill); background:color-mix(in srgb, var(--color-brand-accent) 18%, transparent); color:var(--color-brand-accent); font-weight:700; border:1px solid color-mix(in srgb, var(--color-brand-accent) 30%, transparent);">📌 Pinned</span>` : ''}
                   </div>
                   ${w.description ? `<p class="workspace-desc">${escapeHtml(w.description)}</p>` : ''}
@@ -299,8 +303,9 @@
               </div>
             </div>
             <div class="workspace-card-footer">
-              <div class="workspace-meta-left">
+              <div class="workspace-meta-left" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 ${w.share_enabled ? `<span class="share-status-badge on"><span class="dot"></span>Public Link</span>` : `<span class="share-status-badge off"><span class="dot"></span>Private</span>`}
+                ${isSingle ? `<span class="source-badge file">${icon('file', { size: 12 })} Single Media</span>` : `<span class="source-badge folder">${icon('folder', { size: 12 })} Folder</span>`}
               </div>
               <span class="workspace-date">Created ${new Date(w.created_at).toLocaleDateString()}</span>
             </div>
@@ -313,8 +318,8 @@
         main.addEventListener('click', e => {
           if (e.target.closest('.card-menu, .card-menu-btn, .card-menu-list, button')) return;
           const card = main.closest('.workspace-card');
-          const id = card?.dataset.id;
-          if (id) window.location.href = `/app/workspaces/${id}`;
+          const targetUrl = card?.dataset.targetUrl || (card?.dataset.id ? `/app/workspaces/${card.dataset.id}` : null);
+          if (targetUrl) window.location.href = targetUrl;
         });
       });
 
@@ -399,37 +404,35 @@
 
     function updateFilterCounts() {
       const allCount = allWorkspaces.length;
+      const folderCount = allWorkspaces.filter(w => !Boolean(w.drive_url && (w.drive_url.includes('/file/d/') || w.drive_url.includes('/uc?') || (w.drive_url.includes('id=') && !w.drive_url.includes('/folders/'))))).length;
+      const fileCount = allWorkspaces.filter(w => Boolean(w.drive_url && (w.drive_url.includes('/file/d/') || w.drive_url.includes('/uc?') || (w.drive_url.includes('id=') && !w.drive_url.includes('/folders/'))))).length;
       const publicCount = allWorkspaces.filter(w => w.share_enabled).length;
-      const elAll = document.getElementById('count-all');
-      const elPublic = document.getElementById('count-public');
-      if (elAll) elAll.textContent = allCount;
-      if (elPublic) elPublic.textContent = publicCount;
 
-      const tabAll = document.getElementById('tab-all');
-      const tabPublic = document.getElementById('tab-public');
-      if (tabAll && tabPublic) {
-        if (currentFilter === 'all') {
-          tabAll.style.background = 'var(--color-brand-accent)';
-          tabAll.style.color = '#fff';
-          tabAll.style.fontWeight = '700';
-          tabPublic.style.background = 'transparent';
-          tabPublic.style.color = 'var(--color-text-secondary)';
-          tabPublic.style.fontWeight = '600';
-        } else {
-          tabPublic.style.background = 'var(--color-brand-accent)';
-          tabPublic.style.color = '#fff';
-          tabPublic.style.fontWeight = '700';
-          tabAll.style.background = 'transparent';
-          tabAll.style.color = 'var(--color-text-secondary)';
-          tabAll.style.fontWeight = '600';
+      const setTab = (id, count, active) => {
+        const el = document.getElementById(id);
+        const countEl = document.getElementById(`count-${id.replace('tab-', '')}`);
+        if (countEl) countEl.textContent = count;
+        if (el) {
+          el.style.background = active ? 'var(--color-brand-accent)' : 'transparent';
+          el.style.color = active ? '#fff' : 'var(--color-text-secondary)';
+          el.style.fontWeight = active ? '700' : '600';
         }
-      }
+      };
+
+      setTab('tab-all', allCount, currentFilter === 'all');
+      setTab('tab-folders', folderCount, currentFilter === 'folders');
+      setTab('tab-files', fileCount, currentFilter === 'files');
+      setTab('tab-public', publicCount, currentFilter === 'public');
     }
 
     function applySearchAndRender() {
       const filtered = allWorkspaces.filter(w => {
         const matchesSearch = !currentSearch || w.name.toLowerCase().includes(currentSearch.toLowerCase()) || (w.description && w.description.toLowerCase().includes(currentSearch.toLowerCase()));
-        const matchesFilter = currentFilter === 'all' || (currentFilter === 'public' && w.share_enabled);
+        const isSingle = Boolean(w.drive_url && (w.drive_url.includes('/file/d/') || w.drive_url.includes('/uc?') || (w.drive_url.includes('id=') && !w.drive_url.includes('/folders/'))));
+        let matchesFilter = true;
+        if (currentFilter === 'public') matchesFilter = w.share_enabled;
+        else if (currentFilter === 'folders') matchesFilter = !isSingle;
+        else if (currentFilter === 'files') matchesFilter = isSingle;
         return matchesSearch && matchesFilter;
       });
       render(filtered);
@@ -469,6 +472,16 @@
       applySearchAndRender();
     });
 
+    document.getElementById('tab-folders')?.addEventListener('click', () => {
+      currentFilter = 'folders';
+      applySearchAndRender();
+    });
+
+    document.getElementById('tab-files')?.addEventListener('click', () => {
+      currentFilter = 'files';
+      applySearchAndRender();
+    });
+
     document.getElementById('tab-public')?.addEventListener('click', () => {
       currentFilter = 'public';
       applySearchAndRender();
@@ -498,7 +511,7 @@
 
       btn.disabled = true;
       try {
-        await api('/api/workspaces', {
+        const created = await api('/api/workspaces', {
           method: 'POST',
           body: {
             name: document.getElementById('w-name').value.trim(),
@@ -508,6 +521,11 @@
         });
         dialog.close();
         e.target.reset();
+        if (created?.singleMediaId) {
+          toast('Opening media review…');
+          window.location.href = `/app/workspaces/${created.id}/media/${created.singleMediaId}`;
+          return;
+        }
         toast('Workspace created');
         load();
         loadStats();

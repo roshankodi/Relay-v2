@@ -168,6 +168,11 @@
     async function load() {
       try {
         const { workspace, media } = await api(`/api/workspaces/${id}`);
+        const isSingle = Boolean(workspace.drive_url && (workspace.drive_url.includes('/file/d/') || workspace.drive_url.includes('/uc?') || (workspace.drive_url.includes('id=') && !workspace.drive_url.includes('/folders/'))));
+        if (isSingle && media.length === 1) {
+          window.location.replace(`/app/workspaces/${id}/media/${media[0].id}`);
+          return;
+        }
         render(workspace, media);
       } catch (e) {
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">

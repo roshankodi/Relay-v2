@@ -237,7 +237,26 @@ async function handleListWorkspaces(req, res, session) {
     token: session.token,
     query: { select: WORKSPACE_COLUMNS, order: 'created_at.desc' },
   });
-  json(res, 200, rows.map(w => ({ ...w, isOwner: w.owner_id === session.user.id })));
+  const workspaceIds = rows.map(w => w.id);
+  const mediaByWorkspace = {};
+  if (workspaceIds.length) {
+    const mediaRows = (await pg('media', {
+      token: session.token,
+      query: { select: 'id,workspace_id', workspace_id: `in.(${workspaceIds.join(',')})`, is_deleted: 'eq.false' },
+    })) || [];
+    for (const m of mediaRows) {
+      if (!mediaByWorkspace[m.workspace_id]) mediaByWorkspace[m.workspace_id] = [];
+      mediaByWorkspace[m.workspace_id].push(m.id);
+    }
+  }
+  json(res, 200, rows.map(w => {
+    const mediaIds = mediaByWorkspace[w.id] || [];
+    return {
+      ...w,
+      isOwner: w.owner_id === session.user.id,
+      singleMediaId: mediaIds.length === 1 ? mediaIds[0] : null,
+    };
+  }));
 }
 
 /**
@@ -291,10 +310,22 @@ async function handleCreateWorkspace(req, res, session) {
     body: { workspace_id: workspace.id, user_id: session.user.id, role: 'owner' },
   });
   const files = await scanPublicDriveTarget(input.driveUrl);
+  let mediaList = [];
   if (files.length) {
-    await pg('media', { method: 'POST', token: session.token, body: files.map(f => mediaRow(workspace.id, f)) });
+    mediaList = (await pg('media', {
+      method: 'POST',
+      token: session.token,
+      prefer: 'return=representation',
+      body: files.map(f => mediaRow(workspace.id, f)),
+    })) || [];
   }
-  json(res, 201, { ...workspace, isOwner: true });
+  const isSingleFile = target.type === 'file' && mediaList.length === 1;
+  json(res, 201, {
+    ...workspace,
+    isOwner: true,
+    targetType: target.type,
+    singleMediaId: isSingleFile ? mediaList[0].id : null,
+  });
 }
 
 function mediaRow(workspaceId, f, extra = {}) {
@@ -421,15 +452,16 @@ async function handleGetMedia(req, res, session, mediaId) {
   if (!isUuid(mediaId)) return json(res, 404, { error: 'Not found' });
   const [media] = await pg('media', { token: session.token, query: { select: '*', id: `eq.${mediaId}` } });
   if (!media) return json(res, 404, { error: 'Not found' });
-  const [workspace] = await pg('workspaces', { token: session.token, query: { select: 'id,owner_id', id: `eq.${media.workspace_id}` } });
+  const [workspace] = await pg('workspaces', { token: session.token, query: { select: 'id,owner_id,drive_url', id: `eq.${media.workspace_id}` } });
   const isOwner = workspace?.owner_id === session.user.id;
+  const isSingle = Boolean(workspace?.drive_url && (workspace.drive_url.includes('/file/d/') || workspace.drive_url.includes('/uc?') || (workspace.drive_url.includes('id=') && !workspace.drive_url.includes('/folders/'))));
   const rawComments = await pg('comments', {
     token: session.token,
     query: { select: COMMENT_COLUMNS, media_id: `eq.${mediaId}`, order: 'created_at.asc' },
   });
   const withProfiles = await attachProfiles(rawComments, pg, { token: session.token });
   const comments = sanitizeComments(withProfiles, { userId: session.user.id, isWorkspaceOwner: isOwner });
-  json(res, 200, { media: { ...media, workspaceIsOwner: isOwner }, comments, previewUrl: `/api/media/${mediaId}/file` });
+  json(res, 200, { media: { ...media, workspaceIsOwner: isOwner, workspaceIsSingle: isSingle }, comments, previewUrl: `/api/media/${mediaId}/file` });
 }
 
 /**

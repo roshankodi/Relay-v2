@@ -253,8 +253,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   flex-direction: column;
   justify-content: space-between;
   gap: 32px;
-  padding: 40px 30px;
-  min-height: 190px;
+  padding: 42px 32px;
+  min-height: 205px;
   border-radius: var(--radius-2xl);
   background: var(--glass-bg);
   border: 1px solid color-mix(in srgb, var(--color-brand-accent) 24%, var(--glass-border));
@@ -291,8 +291,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .workspace-icon-box {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-xl);
   background: color-mix(in srgb, var(--color-brand-accent) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-brand-accent) 26%, transparent);
@@ -315,7 +315,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 .workspace-title-link {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--color-text-primary);
@@ -343,7 +343,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .workspace-desc {
   margin: 4px 0 0;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-text-secondary);
   line-height: 1.45;
   display: -webkit-box;
@@ -358,15 +358,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  padding-top: 14px;
+  padding-top: 16px;
   border-top: 1px solid var(--glass-border);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .workspace-date {
   color: var(--color-text-secondary);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
@@ -1656,6 +1656,38 @@ dialog::backdrop { background: rgba(10, 11, 14, 0.55); backdrop-filter: blur(2px
 .share-status-badge.on { color: var(--color-success); background: color-mix(in srgb, var(--color-success) 14%, transparent); }
 .share-status-badge.off { color: var(--color-text-secondary); background: var(--color-surface-alt); }
 .share-status-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  letter-spacing: -0.1px;
+}
+.source-badge.file {
+  color: #38bdf8;
+  background: color-mix(in srgb, #0ea5e9 14%, transparent);
+  border: 1px solid color-mix(in srgb, #0ea5e9 24%, transparent);
+}
+.source-badge.folder {
+  color: var(--color-brand-accent);
+  background: color-mix(in srgb, var(--color-brand-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-accent) 24%, transparent);
+}
+
+.workspace-icon-box.is-file {
+  background: color-mix(in srgb, #0ea5e9 14%, transparent);
+  border-color: color-mix(in srgb, #0ea5e9 26%, transparent);
+  color: #38bdf8;
+}
+.workspace-card:hover .workspace-icon-box.is-file {
+  background: color-mix(in srgb, #0ea5e9 22%, transparent);
+  border-color: color-mix(in srgb, #0ea5e9 45%, transparent);
+  color: #38bdf8;
+}
 
 .switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
 .switch input { opacity: 0; width: 0; height: 0; }
